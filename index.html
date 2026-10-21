@@ -1,0 +1,3277 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Ngân Hàng Câu Hỏi Học Phần 2 - GDQP&AN</title>
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 50%, #f3e8ff 100%);
+      --card-bg: rgba(255, 255, 255, 0.92);
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --primary-Soft: #eef2ff;
+      --text-main: #1e293b;
+      --text-sub: #64748b;
+      --correct-red: #dc2626;
+      --correct-bg: #fef2f2;
+      --correct-border: #f87171;
+      --wrong-bg: #f1f5f9;
+      --wrong-border: #94a3b8;
+      --Wrong-text: #64748b;
+      --border-color: #e2e8f0;
+      --shadow-md: 0 10px 25px -5px rgba(79, 70, 229, 0.08), 0 8px 10px -6px rgba(79, 70, 229, 0.04);
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg-gradient);
+      background-attachment: fixed;
+      color: var(--text-main);
+      min-height: 100vh;
+      line-height: 1.55;
+    }
+
+    /* MÀN HÌNH ĐĂNG NHẬP */
+    #login-overlay {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #312e81 0%, #4f46e5 50%, #0f766e 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+
+    #login-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .login-card {
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(16px);
+      width: 100%;
+      max-width: 420px;
+      padding: 36px 28px;
+      border-radius: 24px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+      text-align: center;
+      animation: floatUp 0.5s ease-out;
+    }
+
+    @keyframes floatUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
+    .shake {
+      animation: shake 0.4s ease;
+    }
+
+    .login-badge {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, #4f46e5, #06b6d4);
+      color: white;
+      border-radius: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+    }
+
+    .login-card h1 {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 6px;
+    }
+
+    .login-card p {
+      font-size: 0.92rem;
+      color: #64748b;
+      margin-bottom: 24px;
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 14px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 14px 44px 14px 16px;
+      border: 2px solid #cbd5e1;
+      border-radius: 12px;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .input-group input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+    }
+
+    .toggle-pw {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.1rem;
+      color: #64748b;
+    }
+
+    .login-error {
+      color: #dc2626;
+      font-size: 0.86rem;
+      font-weight: 600;
+      min-height: 20px;
+      margin-bottom: 12px;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      color: white;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 8px 16px rgba(79, 70, 229, 0.25);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 20px rgba(79, 70, 229, 0.35);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    /* GIAO DIỆN CHÍNH */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+      padding: 12px 20px;
+    }
+
+    .header-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #4f46e5, #0ea5e9);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #1e293b;
+    }
+
+    .brand-sub {
+      font-size: 0.78rem;
+      color: #64748b;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .chip-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 13px;
+      border-radius: 999px;
+      border: 1px solid #cbd5e1;
+      background: white;
+      color: #334155;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .chip-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .chip-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .chip-btn.red-mode.active {
+      background: #dc2626;
+      border-color: #dc2626;
+      color: white;
+    }
+
+    .container {
+      max-width: 1180px;
+      margin: 20px auto;
+      padding: 0 16px 60px;
+      display: grid;
+      grid-template-columns: 290px 1fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    /* SIDEBAR DANH SÁCH BÀI */
+    .sidebar {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      position: sticky;
+      top: 76px;
+    }
+
+    .sidebar-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #475569;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .lesson-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .lesson-btn {
+      width: 100%;
+      text-align: left;
+      padding: 11px 14px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      background: #f8fafc;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .lesson-btn:hover {
+      background: #eef2ff;
+      border-color: #c7d2fe;
+    }
+
+    .lesson-btn.active {
+      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      color: white;
+      box-shadow: 0 6px 14px rgba(79, 70, 229, 0.25);
+    }
+
+    .lesson-btn-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+      font-size: 0.93rem;
+    }
+
+    .lesson-count {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 99px;
+      background: rgba(0, 0, 0, 0.07);
+    }
+
+    .lesson-btn.active .lesson-count {
+      background: rgba(255, 255, 255, 0.22);
+      color: white;
+    }
+
+    .lesson-desc {
+      font-size: 0.78rem;
+      opacity: 0.82;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* THỐNG KÊ NHANH */
+    .stats-box {
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px dashed #cbd5e1;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      text-align: center;
+    }
+
+    .stat-item {
+      background: #f8fafc;
+      padding: 8px 4px;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .stat-val {
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+
+    .stat-val.correct { color: #dc2626; }
+    .stat-val.wrong { color: #475569; }
+    .stat-val.total { color: #4f46e5; }
+
+    .stat-label {
+      font-size: 0.72rem;
+      color: #64748b;
+    }
+
+    /* KHU VỰC CÂU HỎI */
+    .main-area {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .toolbar-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 220px;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 10px 14px 10px 36px;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      font-size: 0.92rem;
+      outline: none;
+    }
+
+    .search-box input:focus {
+      border-color: var(--primary);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      font-size: 0.95rem;
+    }
+
+    .progress-bar-wrap {
+      width: 100%;
+      background: #e2e8f0;
+      height: 8px;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4f46e5, #ec4899, #dc2626);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .question-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      transition: transform 0.2s ease;
+    }
+
+    .q-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 8px;
+    }
+
+    .q-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 8px;
+      background: #eef2ff;
+      color: #4f46e5;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+
+    .q-status {
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .q-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 16px;
+    }
+
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      width: 100%;
+      text-align: left;
+      padding: 13px 16px;
+      border-radius: 12px;
+      border: 1.5px solid #e2e8f0;
+      background: #ffffff;
+      color: #1e293b;
+      font-size: 0.96rem;
+      line-height: 1.45;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .option-btn:hover:not(.locked) {
+      border-color: #6366f1;
+      background: #f5f7ff;
+      transform: translateX(3px);
+    }
+
+    .opt-letter {
+      font-weight: 800;
+      min-width: 24px;
+      color: #4f46e5;
+    }
+
+    /* ĐÁP ÁN ĐÚNG DÒNG CHỮ ĐỎ NỔI BẬT */
+    .option-btn.correct-answer {
+      background: var(--correct-bg);
+      border-color: var(--correct-border);
+      color: var(--correct-red) !important;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.12);
+    }
+
+    .option-btn.correct-answer .opt-letter {
+      color: var(--correct-red) !important;
+    }
+
+    /* ĐÁP ÁN CHỌN SAI */
+    .option-btn.wrong-answer {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+      color: #64748b;
+      text-decoration: line-through;
+      opacity: 0.85;
+    }
+
+    /* BẢNG ĐIỀU HƯỚNG CÂU HỎI NHANH */
+    .palette-wrap {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px dashed #cbd5e1;
+    }
+
+    .palette-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(34px, 1fr));
+      gap: 6px;
+      max-height: 190px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .p-dot {
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      background: white;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      color: #475569;
+      transition: all 0.15s;
+    }
+
+    .p-dot:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .p-dot.done-correct {
+      background: #dc2626;
+      border-color: #dc2626;
+      color: white;
+    }
+
+    .p-dot.done-wrong {
+      background: #475569;
+      border-color: #475569;
+      color: white;
+    }
+
+    /* TỐI ƯU ĐIỆN THOẠI */
+    @media (max-width: 860px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        position: static;
+      }
+      .lesson-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      }
+      .question-card {
+        padding: 16px;
+      }
+      .q-title {
+        font-size: 0.98rem;
+      }
+      .option-btn {
+        padding: 12px;
+        font-size: 0.92rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- MÀN HÌNH KHÓA MẬT KHẨU -->
+  <div id="login-overlay">
+    <div class="login-card" id="login-card">
+      <div class="login-badge">🛡️</div>
+      <h1>Ngân Hàng Câu Hỏi Học Phần 2</h1>
+      <p>Vui lòng nhập mật khẩu để vào hệ thống ôn tập</p>
+      <form id="login-form">
+        <div class="input-group">
+          <input type="password" id="pw-input" placeholder="Nhập mật khẩu truy cập..." autocomplete="off" required />
+          <button type="button" class="toggle-pw" id="toggle-pw" title="Hiện/Ẩn mật khẩu">👁️</button>
+        </div>
+        <div class="login-error" id="login-error"></div>
+        <button type="submit" class="btn-primary">Đăng Nhập Ngay</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-icon">QP</div>
+        <div>
+          <div class="brand-title">Ôn Tập Học Phần 2 - GDQP & AN</div>
+          <div class="brand-sub">200 câu hỏi trắc nghiệm phân theo 7 bài học</div>
+        </div>
+      </div>
+      <div class="header-controls">
+        <button class="chip-btn red-mode" id="btn-show-red" title="Hiện toàn bộ đáp án chữ đỏ để học thuộc">
+          🔴 Hiện đáp án chữ đỏ: <span id="red-state">TẮT</span>
+        </button>
+        <button class="chip-btn active" id="btn-sound" title="Bật/Tắt âm thanh khi chọn đáp án">
+          🔊 Âm thanh: <span id="sound-state">BẬT</span>
+        </button>
+        <button class="chip-btn" id="btn-shuffle" title="Trộn ngẫu nhiên thứ tự câu hỏi trong bài">
+          🔀 Trộn câu hỏi
+        </button>
+        <button class="chip-btn" id="btn-reset" title="Làm lại bài đang chọn">
+          🔄 Làm lại bài này
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- NỘI DUNG CHÍNH -->
+  <div class="container">
+    <!-- CỘT TRÁI: CHỌN MỤC BÀI -->
+    <aside class="sidebar">
+      <div class="sidebar-title">
+        <span>Danh Mục Bài Học</span>
+        <span id="total-bank-count">200 câu</span>
+      </div>
+      <div class="lesson-list" id="lesson-list"></div>
+
+      <div class="stats-box">
+        <div class="stat-item">
+          <div class="stat-val correct" id="stat-correct">0</div>
+          <div class="stat-label">Đúng (Đỏ)</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val wrong" id="stat-wrong">0</div>
+          <div class="stat-label">Chưa đúng</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val total" id="stat-remain">0</div>
+          <div class="stat-label">Còn lại</div>
+        </div>
+      </div>
+
+      <div class="palette-wrap">
+        <div class="sidebar-title" style="margin-bottom: 8px; font-size: 0.8rem;">
+          <span>Chọn nhanh câu hỏi</span>
+        </div>
+        <div class="palette-grid" id="palette-grid"></div>
+      </div>
+    </aside>
+
+    <!-- CỘT PHẢI: DANH SÁCH CÂU HỎI -->
+    <main class="main-area">
+      <div class="toolbar-card">
+        <div>
+          <h2 id="current-lesson-title" style="font-size: 1.15rem; color: #1e293b;">Bài 1</h2>
+          <p id="current-lesson-sub" style="font-size: 0.84rem; color: #64748b;">Chọn đáp án để kiểm tra âm thanh và hiện dòng chữ đỏ</p>
+        </div>
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-input" placeholder="Tìm nhanh từ khóa câu hỏi..." />
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="progress-fill"></div>
+        </div>
+      </div>
+
+      <div id="questions-container" style="display: flex; flex-direction: column; gap: 16px;"></div>
+    </main>
+  </div>
+
+  <script>
+    /**************************************************************
+     * 1. BỘ PHÁT ÂM THANH HIỆU ỨNG (WEB AUDIO API - KHÔNG CẦN FILE RỜI)
+     **************************************************************/
+    let soundEnabled = true;
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+      }
+      if (audioCtx.state === "suspended") {
+        audioCtx.resume();
+      }
+    }
+
+    function playSound(isCorrect) {
+      if (!soundEnabled) return;
+      try {
+        initAudio();
+        const now = audioCtx.currentTime;
+        if (isCorrect) {
+          // Âm thanh ĐÚNG: Hai nốt cao trong trẻo (Ting - Ting!)
+          const osc1 = audioCtx.createOscillator();
+          const osc2 = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc1.type = "sine";
+          osc2.type = "triangle";
+          osc1.frequency.setValueAtTime(587.33, now); // D5
+          osc1.frequency.setValueAtTime(880, now + 0.09); // A5
+          osc2.frequency.setValueAtTime(293.66, now);
+          osc2.frequency.setValueAtTime(440, now + 0.09);
+
+          gain.gain.setValueAtTime(0.22, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+
+          osc1.connect(gain);
+          osc2.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc1.start(now);
+          osc2.start(now);
+          osc1.stop(now + 0.38);
+          osc2.stop(now + 0.38);
+        } else {
+          // Âm thanh SAI: Âm trầm báo lỗi (Buzzz)
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = "sawtooth";
+          osc.frequency.setValueAtTime(160, now);
+          osc.frequency.linearRampToValueAtTime(115, now + 0.28);
+
+          gain.gain.setValueAtTime(0.18, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc.start(now);
+          osc.stop(now + 0.3);
+        }
+      } catch (e) {
+        console.warn("Audio error:", e);
+      }
+    }
+
+    /**************************************************************
+     * 2. DỮ LIỆU NGÂN HÀNG 200 CÂU HỎI HỌC PHẦN 2 (BÀI 1 -> BÀI 7)
+     **************************************************************/
+    const LESSONS_META = [
+      { id: "bai1", name: "Bài 1", desc: "Chiến lược Diễn biến hòa bình & BLLĐ" },
+      { id: "bai2", name: "Bài 2", desc: "Dân tộc, tôn giáo & Phòng chống lợi dụng" },
+      { id: "bai3", name: "Bài 3", desc: "Pháp luật về Bảo vệ môi trường" },
+      { id: "bai4", name: "Bài 4", desc: "Pháp luật về Trật tự, an toàn giao thông" },
+      { id: "bai5", name: "Bài 5", desc: "Bảo vệ danh dự, nhân phẩm con người" },
+      { id: "bai6", name: "Bài 6", desc: "An ninh mạng & Tội phạm công nghệ cao" },
+      { id: "bai7", name: "Bài 7", desc: "An ninh truyền thống & Phi truyền thống" },
+      { id: "all",  name: "Tất cả (200 câu)", desc: "Tổng hợp toàn bộ 7 bài Học phần 2" }
+    ];
+
+    const QUESTION_BANK = [
+      // ==================== BÀI 1 (38 CÂU) ====================
+      {
+        lesson: "bai1", code: "Câu 01",
+        q: 'Chiến lược "Diễn biến hòa bình" được định nghĩa là gì?',
+        options: [
+          "A. Chiến lược quân sự sử dụng vũ khí công nghệ cao để tấn công chớp nhoáng, lật đổ chính quyền một nước.",
+          "B. Chiến lược tổng hợp của chủ nghĩa đế quốc và các thế lực thù địch nhằm lật đổ chế độ chính trị - xã hội của các nước tiến bộ, trước hết là các nước xã hội chủ nghĩa từ bên trong, bằng các biện pháp phi quân sự.",
+          "C. Biện pháp hòa bình nhằm giải quyết các xung đột quốc tế và tranh chấp chủ quyền thông qua đàm phán ngoại giao.",
+          "D. Chiến lược phát triển kinh tế kết hợp với viện trợ nhân đạo để giúp đỡ các quốc gia kém phát triển."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai1", code: "Câu 02",
+        q: 'Biện pháp của chủ nghĩa đế quốc và các thế lực phản động tiến hành chiến lược “Diễn biến hòa bình” là?',
+        options: [
+          "A. Biện pháp phi quân sự",
+          "B. Biện pháp quân sự",
+          "C. Biện pháp ngoại giao",
+          "D. Biện pháp bạo loạn"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai1", code: "Câu 03",
+        q: "Khi xảy ra tình huống bạo loạn lật đổ, phương châm tiến hành xử lý của ta được xác định là?",
+        options: [
+          "A. Chờ đợi lực lượng chuyên trách từ Trung ương về rồi mới bắt đầu giải quyết.",
+          "B. Sử dụng biện pháp nhượng bộ, thỏa hiệp toàn bộ các yêu sách của lực lượng bạo loạn.",
+          "C. Chủ động, kiên quyết, khẩn trương, xử lý nhanh gọn, triệt để ngay từ cơ sở.",
+          "D. Cách ly hoàn toàn địa bàn bạo loạn và để mặc tình hình tự ổn định."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai1", code: "Câu 04",
+        q: 'Chủ nghĩa đế quốc và các thế lực thù địch sử dụng chiến lược “Diễn biến hòa bình” đối với Việt Nam nhằm mục đích gì?',
+        options: [
+          "A. Xóa bỏ vai trò lãnh đạo của Đảng",
+          "B. Xóa bỏ hệ thống chính trị, kinh tế",
+          "C. Lật đổ chế độ, theo quỹ đạo của chúng",
+          "D. Tự do hóa đời sống chính trị, xã hội"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai1", code: "Câu 05",
+        q: "Một trong những yêu cầu cốt lõi trong phương châm tiến hành xử lý bạo loạn lật đổ nhằm bảo đảm tính chính nghĩa là?",
+        options: [
+          "A. Hạn chế đến mức thấp nhất thiệt hại về người và tài sản, không để địch lợi dụng.",
+          "B. Tập trung lực lượng quân sự giải tán bạo loạn trong thời gian ngắn nhất.",
+          "C. Tạm hoãn việc xử lý các đối tượng cầm đầu để thương lượng chính trị.",
+          "D. Huy động lực lượng tư nhân tham gia bảo vệ an ninh trật tự khu vực."
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai1", code: "Câu 06",
+        q: 'Phòng chống chiến lược “diễn biến hòa bình”, bạo loạn lật đổ ở nước ta hiện nay, chúng ta phải thực hiện giải pháp nào sau đây?',
+        options: [
+          "A. Nâng cao nhận thức về âm mưu, thủ đoạn của các thế lực thù địch, nắm chắc mọi diễn biến không để bị động và bất ngờ.",
+          "B. Nâng cao tinh thần yêu nước, hăng hái lao động sản xuất và tích cực phòng chống thiên tai cho nhân dân",
+          "C. Nâng cao đời sống vật chất, tinh thần cho nhân dân, đẩy lùi các hủ tục lạc hậu, mê tín dị đoan và các tệ nạn xã hội",
+          "D. Nâng cao ý thức dân tộc, yêu Tổ quốc, yêu đồng bào, trách nhiệm công dân cho tuổi trẻ nhất là học sinh, sinh viên"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai1", code: "Câu 07",
+        q: 'Mục đích chống phá tư tưởng - văn hóa trong chiến lược “Diễn biến hòa bình” là?',
+        options: [
+          "A. Xóa bỏ chủ nghĩa Mác Lênin, tư tưởng Hồ Chí Minh",
+          "B. Xóa bỏ nguồn gốc tư tưởng XHCN",
+          "C. Xóa bỏ đường lối chính trị của Đảng Cộng sản",
+          "D. Xóa bỏ tư tưởng vô sản, thiết lập tư tưởng tư sản"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai1", code: "Câu 08",
+        q: "Trong các hình thức bạo loạn lật đổ, hình thức nào được đánh giá là nguy hiểm, tinh vi và phổ biến nhất hiện nay khi địch dùng một yếu tố làm nền tảng tạo cớ và yếu tố còn lại làm mũi nhọn quyết định?",
+        options: [
+          "A. Bạo loạn vũ trang thuần túy từ biên giới.",
+          "B. Bạo loạn chính trị kéo dài không sử dụng bạo lực.",
+          "C. Bạo loạn chính trị kết hợp với bạo loạn vũ trang.",
+          "D. Bạo loạn kinh tế kết hợp ngoại giao quốc tế."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai1", code: "Câu 09",
+        q: 'Một trong những giải pháp phòng chống chiến lược “Diễn biến hòa bình”, BLLĐ là?',
+        options: [
+          "A. Chăm lo xây dựng lực lượng vũ trang ở địa phương vững mạnh",
+          "B. Xây dựng hệ thống chính trị cả nước vững mạnh toàn diện",
+          "C. Đẩy mạnh công nghiệp hóa hiện đại hóa, chống tụt hậu kinh tế",
+          "D. Xây dựng lòng yêu nước cho tuổi trẻ nhất là học sinh, sinh viên"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai1", code: "Câu 10",
+        q: 'Thực hiện chiến lược “Diễn biến hòa bình”, chủ nghĩa đế quốc và các thế lực thù địch khích lệ lối sống tư sản, từng bước làm phai nhạt mục tiêu, lý tưởng XHCN ở tầng lớp nào?',
+        options: [
+          "A. Thanh niên, nhất là sinh viên",
+          "B. Học sinh, sinh viên thành thị",
+          "C. Công nhân các khu công nghiệp",
+          "D. Người dân nghèo ở thành thị"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai1", code: "Câu 11",
+        q: "Bạo loạn lật đổ có thể xảy ra ở nhiều nơi, nhiều vùng của đất nước, trọng điểm là?",
+        options: [
+          "A. Các trung tâm chính trị, kinh tế",
+          "B. Các khu công nghiệp tập trung",
+          "C. Các trung tâm văn hóa, khoa học",
+          "D. Các khu công nghệ, kỹ thuật cao"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai1", code: "Câu 12",
+        q: 'Chủ nghĩa đế quốc và các thế lực thù địch thực hiện chiến lược “Diễn biến hòa bình” đối với Việt Nam từ khi nào?',
+        options: [
+          "A. Sau thất bại chiến tranh xâm lược Việt Nam",
+          "B. Khi đưa quân vào xâm lược miền Nam",
+          "C. Sau biến động chế độ XHCN ở Liên Xô",
+          "D. Khi Việt Nam tiến hành sự nghiệp đổi mới"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai1", code: "Câu 13",
+        q: 'Quan hệ giữa “Diễn biến hòa bình” và bạo loạn lật đổ?',
+        options: [
+          "A. “Diễn biến hòa bình” là quá trình tạo nên những điều kiện, thời cơ cho bạo loạn lật đổ",
+          "B. “Diễn biến hòa bình” là quá trình đưa đến nguyên nhân và điều kiện của bạo loạn lật đổ",
+          "C. “Diễn biến hòa bình” là quá trình tạo yếu tố quyết định cho bạo loạn lật đổ",
+          "D. “Diễn biến hòa bình” là quá trình tạo thời cơ quan trọng nhất cho bạo loạn lật đổ"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai1", code: "Câu 14",
+        q: 'Trong chiến lược “Diễn biến hòa bình”, thủ đoạn về kinh tế được kẻ thù xác định là?',
+        options: [
+          "A. Thủ đoạn mũi nhọn",
+          "B. Thủ đoạn chủ yếu",
+          "C. Thủ đoạn hàng đầu",
+          "D. Thủ đoạn cơ bản"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai1", code: "Câu 15",
+        q: 'Thực hiện thủ đoạn chống phá về chính trị trong chiến lược “Diễn biến hòa bình" đối với cách mạng Việt Nam, kẻ thù tiến hành?',
+        options: [
+          "A. Kích động đòi thực hiện chế độ “đa nguyên chính trị, đa đảng đối lập”",
+          "B. Phá vỡ khối đại đoàn kết toàn dân của các tổ chức chính trị, xã hội",
+          "C. Chia rẽ nội bộ, kích động gây rối loạn các tổ chức trong xã hội",
+          "D. Cô lập Đảng, Nhà nước với quân đội nhân dân và công an nhân dân"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai1", code: "Câu 16",
+        q: 'Trách nhiệm sinh viên cần làm gì để góp phần làm thất bại chiến lược “diễn biến hoà bình”, bạo loạn lật đổ của các thế lực thù địch?',
+        options: [
+          "A. Luôn học tập phấn đấu, nâng cao cảnh giác tự bảo vệ mình, bảo vệ nơi mình cư trú.",
+          "B. Luôn nâng cao cảnh giác tích cực tham gia các hoạt động phong trào ở nhà trường và địa phương.",
+          "C. Tích cực học tập, rèn luyện, nâng cao tinh thần cảnh giác cách mạng, phát hiện, đấu tranh, ngăn ngừa",
+          "D. Tích cực học tập, rèn luyện tham gia xây dựng thế trận quốc phòng, an ninh nhân dân trong mọi tình huống."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai1", code: "Câu 17",
+        q: 'Thực hiện thủ đoạn trong lĩnh vực tôn giáo, dân tộc của chiến lược “Diễn biến hòa bình”, kẻ thù lợi dụng vấn đề dân tộc để kích động tư tưởng?',
+        options: [
+          "A. Đòi ly khai, tự quyết dân tộc",
+          "B. Chia rẽ các dân tộc, gây mâu thuẫn",
+          "C. Đòi biểu tình, ly khai lập khu tự trị",
+          "D. Gây mâu thuẫn giữa các dân tộc"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai1", code: "Câu 18",
+        q: 'Luận điệu đòi "phi chính trị hóa" lực lượng vũ trang của các thế lực thù địch thực chất nhằm mục đích gì?',
+        options: [
+          "A. Tách Quân đội và Công an ra khỏi sự lãnh đạo của Đảng, làm mất phương hướng chiến đấu của lực lượng vũ trang.",
+          "B. Nâng cao trình độ kỹ thuật công nghệ cao cho cán bộ, chiến sĩ.",
+          "C. Biến lực lượng vũ trang thành một tổ chức kinh tế thuần túy độc lập.",
+          "D. Giúp lực lượng vũ trang gia tăng số lượng quân số nhanh chóng."
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai1", code: "Câu 19",
+        q: "Để triệt tiêu các điều kiện mà thế lực thù địch có thể lợi dụng để kích động bạo loạn lật đổ, giải pháp về kinh tế - xã hội cần tập trung trọng tâm vào nội dung nào?",
+        options: [
+          "A. Tập trung đầu tư ngân sách quốc gia vào việc xây dựng hệ thống phòng thủ dân sự.",
+          "B. Tập trung phát triển kinh tế - xã hội, nâng cao đời sống vật chất và tinh thần của nhân dân, thực hiện tốt chính sách an sinh, xóa đói giảm nghèo.",
+          "C. Tập trung đầu tư phát triển tại vùng sâu, vùng xa.",
+          "D. Tập trung phát triển các đô thị lớn, làm động lực thúc đẩy các vùng khác phát triển."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai1", code: "Câu 20",
+        q: "Các thế lực thù địch thường lợi dụng gây rối để làm gì?",
+        options: [
+          "A. Để tập duyệt âm mưu phá hoại, lật đổ chính quyền.",
+          "B. Để gây bạo loạn, gây chiến tranh.",
+          "C. Để tập duyệt hoặc mở màn cho bạo loạn lật đổ.",
+          "D. Để phá hoại, gây rối, mất trật tự an ninh."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai1", code: "Câu 21",
+        q: 'Mục tiêu của chủ nghĩa đế quốc và các thế lực thù địch sử dụng chiến lược “Diễn biến hòa bình” đối với Việt Nam là?',
+        options: [
+          "A. Xóa bỏ chế độ XHCN",
+          "B. Thực hiện chế độ đa nguyên chính trị",
+          "C. Thực hiện tự do chính trị - xã hội",
+          "D. Xóa bỏ hệ thống chính trị - xã hội"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai1", code: "Câu 22",
+        q: "Lực lượng tiến hành bạo loạn lật đổ thường là?",
+        options: [
+          "A. Lực lượng ly khai, đối lập trong nước hoặc cấu kết với nước ngoài",
+          "B. Lực lượng đối lập phối hợp chặt chẽ với lực lượng ly khai bên ngoài",
+          "C. Lực lượng ly khai phối hợp với lực lượng dân chủ, nhân quyền",
+          "D. Lực lượng bất mãn chống đối trong nước cấu kết với kẻ thù từ bên ngoài"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai1", code: "Câu 23",
+        q: 'Thực hiện chiến lược “Diễn biến hòa bình” chống phá CNXH, CNĐQ và các thế lực thù địch luôn coi Việt Nam là?',
+        options: [
+          "A. Một trọng điểm",
+          "B. Vấn đề cơ bản",
+          "C. Một trọng tâm",
+          "D. Vấn đề trọng điểm"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai1", code: "Câu 24",
+        q: 'Chống phá về chính trị trong chiến lược “Diễn biến hòa bình”, kẻ thù âm mưu thực hiện?',
+        options: [
+          "A. Xóa bỏ vai trò lãnh đạo của Đảng và chế độ XHCN",
+          "B. Đối lập chủ nghĩa Mác-Lênin và tư tưởng Hồ Chí Minh",
+          "C. Phủ định chủ nghĩa Mác-Lênin, xóa bỏ CNXH",
+          "D. Đối lập nhiệm vụ kinh tế và quốc phòng, an ninh trật tự"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai1", code: "Câu 25",
+        q: 'Một trong những mục tiêu phòng chống chiến lược “Diễn biến hoà bình”?',
+        options: [
+          "A. Bảo vệ vững chắc độc lập, chủ quyền, thống nhất, toàn vẹn lãnh thổ",
+          "B. Giữ vững ổn định chính trị trên cơ sở độc lập chủ quyền dân tộc",
+          "C. Bảo vệ vững chắc độc lập, chủ quyền của quốc gia, dân tộc",
+          "D. Bảo vệ vững chắc chế độ nhà nước Việt Nam XHCN"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai1", code: "Câu 26",
+        q: 'Thực hiện thủ đoạn chính trị trong chiến lược “Diễn biến hòa bình”, các thế lực thù địch thường khai thác, tận dụng những sơ hở trong đường lối, chủ trương, chính sách của Đảng, nhà nước ta để kích động?',
+        options: [
+          "A. Quần chúng biểu tình, chống đối",
+          "B. Công nhân đình công phản đối",
+          "C. Học sinh, sinh viên đình công",
+          "D. Nhân dân gây rối chính quyền"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai1", code: "Câu 27",
+        q: "Đảng ta xác định rõ nội dung bảo vệ Tổ quốc Việt Nam XHCN là toàn diện, trong đó coi trọng?",
+        options: [
+          "A. An ninh kinh tế, chính trị, văn hóa, tư tưởng",
+          "B. An ninh chính trị, xã hội, biên giới, biển đảo",
+          "C. An ninh kinh tế, chính trị, trật tự xã hội, lãnh thổ",
+          "D. An ninh chính trị, đối ngoại, trật tự an toàn xã hội"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai1", code: "Câu 28",
+        q: 'Để nhanh chóng đạt được mục đích của “Diễn biến hòa bình”, chủ nghĩa đế quốc và các thế lực thù địch thường tiến hành thủ đoạn?',
+        options: [
+          "A. Bạo loạn lật đổ",
+          "B. Can thiệp quân sự",
+          "C. Bạo loạn vũ trang",
+          "D. Hành động bạo lực"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai1", code: "Câu 29",
+        q: 'Đẩy mạnh chiến lược “Diễn biến hòa bình” ở nước ta, chủ nghĩa đế quốc và các thế lực thù địch thường triệt để khai thác và lợi dụng những khó khăn, sai sót của Đảng, Nhà nước tạo nên sức ép, từng bước chuyển hóa để?',
+        options: [
+          "A. Thay đổi đường lối chính trị, đi theo quỹ đạo chủ nghĩa tư bản",
+          "B. Lôi kéo quần chúng nhân dân đi theo chúng để được giàu có",
+          "C. Thay đổi chế độ, theo phương tây để được bảo hộ của tư bản",
+          "D. Gây mâu thuẫn, kích động nhân dân bạo loạn vũ trang"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai1", code: "Câu 30",
+        q: 'Một trong những chiêu bài mà chủ nghĩa đế quốc và các thế lực thù địch sử dụng trong “Diễn biến hòa bình” đối với Việt Nam là?',
+        options: [
+          "A. Dân chủ, nhân quyền",
+          "B. Tự do, dân chủ",
+          "C. Nhân quyền, bình đẳng",
+          "D. Bình đẳng, tự do"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai1", code: "Câu 31",
+        q: 'Thủ đoạn thâm độc nhất của các thế lực thù địch trên lĩnh vực đối ngoại nhằm thực hiện chiến lược “diễn biến hòa bình” đối với nước ta là gì?',
+        options: [
+          "A. Khoét sâu mâu thuẫn ngoại giao để ép buộc Việt Nam lệ thuộc vào các thể chế tài chính và hiệp định thương mại toàn cầu.",
+          "B. Lợi dụng các tranh chấp chủ quyền biển đảo để kích động xung đột quân sự khu vực, buộc Việt Nam phải chọn phe.",
+          "C. Chia rẽ Việt Nam với Lào, Campuchia và các nước xã hội chủ nghĩa nhằm phá vỡ liên minh chiến lược truyền thống.",
+          "D. Xuyên tạc đường lối ngoại giao cây tre, gieo rắc tư tưởng hoài nghi về vai trò lãnh đạo của Đảng trong hội nhập quốc tế."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai1", code: "Câu 32",
+        q: 'Để góp phần làm thất bại chiến lược “diễn biến hòa bình”, bạo loạn lật đổ của các thế lực thù địch, cần nắm vững một trong những mục tiêu nào?',
+        options: [
+          "A. Bảo vệ sự nghiệp công nghiệp hóa, hiện đại hóa đất nước.",
+          "B. Bảo vệ tính mạng và tài sản của nhân dân.",
+          "C. Bảo vệ sự nghiệp đổi mới và lợi ích quốc gia, dân tộc.",
+          "D. Bảo vệ An ninh Chính trị của đất nước."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai1", code: "Câu 33",
+        q: 'Để góp phần làm thất bại chiến lược “diễn biến hoà bình”, bạo loạn lật đổ của các thế lực thù địch, cần nắm vững một trong những phương châm chỉ đạo nào?',
+        options: [
+          "A. Kiên định con đường đi lên chủ nghĩa xã hội mà Đảng và Chủ tịch Hồ Chí Minh đã lựa chọn.",
+          "B. Phát huy tiềm năng của các địa phương để xây dựng khu vực phòng thủ vững chắc, đảm bảo ngăn chặn sự xuất hiện và phát triển của “diễn biến hòa bình”, bạo loạn lật đổ.",
+          "C. Xây dựng tiềm lực vững mạnh của đất nước, tranh thủ sự ủng hộ của nhân dân trong nước và quốc tế, kịp thời làm thất bại mọi âm mưu, thủ đoạn chống phá của kẻ thù.",
+          "D. Kiên quyết chống lại các biểu hiện mất cảnh giác, chủ quan trong việc chống “Diễn biến hòa bình” ở các đơn vị cơ sở"
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai1", code: "Câu 34",
+        q: 'Các thế lực thù địch chống phá ta về tư tưởng - văn hóa trong chiến lược “diễn biến hòa bình”, bạo loạn lật đổ nhằm mục đích gì?',
+        options: [
+          "A. Xoá bỏ chủ nghĩa Mác - Lênin và tư tưởng Hồ Chí Minh.",
+          "B. Phá hoại sự đoàn kết của toàn Đảng, toàn quân, toàn dân.",
+          "C. Phá hoại nguyên tắc tập trung dân chủ của Đảng và Nhà nước ta.",
+          "D. Phá hoại, xuyên tạc đường lối đổi mới của Đảng và Nhà nước ta."
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai1", code: "Câu 35",
+        q: 'Một trong những nội dung chống phá về kinh tế trong chiến lược “Diễn biến hòa bình” của các thế lực thù địch đối với nước ta là gì?',
+        options: [
+          "A. Khích lệ thành phần kinh tế tư nhân phát triển, từng bước làm mất vai trò chủ đạo của thành phần kinh tế Nhà nước.",
+          "B. Khích lệ kinh tế 100% vốn nước ngoài phát triển, làm mất vai trò chủ đạo của thành phần kinh tế Nhà nước.",
+          "C. Khích lệ kinh tế cá thể, tiểu chủ phát triển, làm mất vai trò chủ đạo của thành phần kinh tế Nhà nước.",
+          "D. Khích lệ kinh tế tư bản nhà nước."
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai1", code: "Câu 36",
+        q: 'Một trong những nội dung chống phá về chính trị trong chiến lược “diễn biến hòa bình” của các thế lực thù địch đối với nước ta là gì?',
+        options: [
+          "A. Đối lập Chủ nghĩa Mác - Lênin và tư tưởng Hồ Chí Minh.",
+          "B. Phủ định Chủ nghĩa Mác - Lênin, tư tưởng Hồ Chí Minh và đường lối của Đảng.",
+          "C. Đối lập nhiệm vụ kinh tế - xã hội và quốc phòng - an ninh.",
+          "D. Chia rẽ mối quan hệ giữa Đảng với nhân dân và khối đại đoàn kết toàn dân tộc."
+        ],
+        ans: 3
+      },
+      {
+        lesson: "bai1", code: "Câu 37",
+        q: 'Các thế lực thù địch triệt để lợi dụng chính sách tự do tôn giáo của Đảng ta thông qua chiến lược “diễn biến hòa bình” nhằm mục đích gì?',
+        options: [
+          "A. Truyền bá mê tín dị đoan và tư tưởng phản động chống chủ nghĩa xã hội.",
+          "B. Truyền đạo trái phép nhằm thực hiện âm mưu tôn giáo hóa dân tộc.",
+          "C. Truyền bá mê tín dị đoan, tập hợp lực lượng để chống phá cách mạng.",
+          "D. Truyền bá mê tín và tổ chức lực lượng khủng bố."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai1", code: "Câu 38",
+        q: 'Trong chiến lược “diễn biến hoà bình”, các thế lực thù địch triệt để lợi dụng tôn giáo để tích cực hoạt động nhất là hoạt động phá hoại nhằm mục đích gì?',
+        options: [
+          "A. Tạo dựng lực lượng, xây dựng ngọn cờ để chống lại Nhà nước ta.",
+          "B. Gây mất ổn định xã hội và làm chệch hướng chế độ chủ nghĩa xã hội.",
+          "C. Tạo lực lượng phản động núp bóng tôn giáo.",
+          "D. Tạo dựng lực lượng phản động gây bạo loạn ở địa phương."
+        ],
+        ans: 0
+      },
+
+      // ==================== BÀI 2 (26 CÂU) ====================
+      {
+        lesson: "bai2", code: "Câu 01",
+        q: "Việt Nam là quốc gia thống nhất gồm bao nhiêu dân tộc cùng sinh sống?",
+        options: [
+          "A. 54 dân tộc cùng sinh sống",
+          "B. 56 dân tộc cùng sinh sống",
+          "C. 52 dân tộc cùng sinh sống",
+          "D. 57 dân tộc cùng sinh sống"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai2", code: "Câu 02",
+        q: "Tính chất của tôn giáo?",
+        options: [
+          "A. Tính lịch sử, tính quần chúng, tính chính trị",
+          "B. Tính kế thừa, tính phát triển, tính chính trị",
+          "C. Tính chính trị, tính chọn lọc, tính phát triển",
+          "D. Tính kế thừa, tính quần chúng, tính thực tiễn"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai2", code: "Câu 03",
+        q: "Một trong những đặc điểm của các dân tộc ở Việt Nam là?",
+        options: [
+          "A. Mỗi dân tộc ở Việt Nam đều có sắc thái văn hóa riêng",
+          "B. Các dân tộc Việt Nam đều có chung phong tục, tập quán riêng",
+          "C. Mỗi dân tộc Việt Nam đều có nền văn hóa riêng",
+          "D. Các dân tộc Việt Nam đều có các tôn giáo riêng"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai2", code: "Câu 04",
+        q: "Một trong những đặc điểm của các dân tộc thiểu số ở Việt Nam là?",
+        options: [
+          "A. Cư trú phân tán và xen kẽ",
+          "B. Cư trú du canh, du cư",
+          "C. Cư trú tập trung",
+          "D. Cư trú ở rừng núi"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai2", code: "Câu 05",
+        q: "Để thực hiện thủ đoạn lợi dụng vấn đề dân tộc, tôn giáo chống phá cách mạng Việt Nam, các thế lực thù địch thường sử dụng chiêu bài?",
+        options: [
+          "A. “nhân quyền”, “dân chủ”, “tự do\"",
+          "B. “dân chủ”, “tuyên truyền”, “tự do”",
+          "C. “truyền đạo”, “dân chủ”, “tự do”",
+          "D. “nhân quyền”, “kích động”, “dân chủ”"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai2", code: "Câu 06",
+        q: "Quyền tự do tín ngưỡng tôn giáo được hiểu là?",
+        options: [
+          "A. Mọi người đều được tự do theo hoặc không theo tôn giáo",
+          "B. Mọi người đều được tự do thờ cúng hoặc không thờ cúng",
+          "C. Mọi người đều được tự do tin hay không tin ở thần linh",
+          "D. Mọi người đều được tự do cầu trời, cầu tự cho mình"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai2", code: "Câu 07",
+        q: "Theo quan điểm của chủ nghĩa Mác-Lênin, vấn đề dân tộc là?",
+        options: [
+          "A. Vấn đề cần thiết của cách mạng XHCN",
+          "B. Vấn đề chiến lược của cách mạng XHCN",
+          "C. Vấn đề quan trọng của cách mạng XHCN",
+          "D. Vấn đề sách lược của cách mạng XHCN"
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai2", code: "Câu 08",
+        q: "Tôn giáo có nguồn gốc từ các yếu tố?",
+        options: [
+          "A. Kinh tế - xã hội, nhận thức và tâm lý",
+          "B. Chính trị - xã hội, tâm lý và ý thức",
+          "C. Kinh tế - xã hội, ý thức và giáo lý",
+          "D. Chính trị - quân sự, tâm lý và nhận thức"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai2", code: "Câu 09",
+        q: "Để đấu tranh phòng chống các thế lực thù địch lợi dụng vấn đề dân tộc, tôn giáo, chúng ta phải phát huy vai trò của?",
+        options: [
+          "A. Cả hệ thống chính trị",
+          "B. Đồng bào các dân tộc, tôn giáo",
+          "C. Các tổ chức quần chúng",
+          "D. Các già làng, chức sắc tôn giáo"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai2", code: "Câu 10",
+        q: "Một trong những đặc điểm của các dân tộc ở Việt Nam là?",
+        options: [
+          "A. Có truyền thống đoàn kết gắn bó xây dựng quốc gia dân tộc thống nhất",
+          "B. Có truyền thống yêu nước, thương nòi kế tiếp đời này qua đời khác",
+          "C. Có tinh thần chịu đựng gian khổ, khó khăn, không sợ hy sinh, vất vả",
+          "D. Có tinh thần độc lập tự chủ, chịu thương, chịu khó làm ăn sinh sống"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai2", code: "Câu 11",
+        q: "Nhóm các tôn giáo nào sau đây thuộc về 6 tôn giáo lớn, có số lượng tín đồ đông đảo nhất tại Việt Nam hiện nay?",
+        options: [
+          "A. Phật giáo, Công giáo, Tin Lành, Cao Đài, Hòa Hảo, Hồi giáo.",
+          "B. Phật giáo, Ấn Độ giáo, Cơ đốc giáo, Mặc Môn, Baha'i.",
+          "C. Công giáo, Chính thống giáo, Anh giáo, Hồi giáo, Tà Lơn.",
+          "D. Tin Lành, Bà-la-môn, Minh Sư đạo, Cao Đài, Hòa Hảo."
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai2", code: "Câu 12",
+        q: "Theo quan điểm của chủ nghĩa Mác-Lênin, giải quyết vấn đề dân tộc trong cách mạng xã hội chủ nghĩa?",
+        options: [
+          "A. Vừa là mục tiêu vừa là động lực của cách mạng XHCN",
+          "B. Vừa là quan điểm vừa là phương châm của nhà nước vô sản",
+          "C. Vừa là mục tiêu vừa là phương thức của nhà nước XHCN",
+          "D. Vừa là nội dung vừa là quan điểm của cách mạng XHCN"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai2", code: "Câu 13",
+        q: "Một trong những quan điểm, chính sách dân tộc của Đảng, Nhà nước ta là?",
+        options: [
+          "A. Chống các biểu hiện kỳ thị, hẹp hòi, chia rẽ dân tộc",
+          "B. Chống phân biệt, đối xử khác nhau giữa các dân tộc",
+          "C. Chống mọi hành động áp đặt trong công tác dân tộc",
+          "D. Chống tuyên truyền, lôi kéo kích động các dân tộc"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai2", code: "Câu 14",
+        q: "Một trong những lý do dẫn đến vấn đề dân tộc còn tồn tại lâu dài là do?",
+        options: [
+          "A. Dân số và trình độ phát triển kinh tế - xã hội giữa các dân tộc không đều nhau",
+          "B. Các dân tộc chưa đồng thời đứng lên đấu tranh chống chủ nghĩa đế quốc",
+          "C. Sự chống phá của chủ nghĩa đế quốc đối với các dân tộc trên toàn thế giới",
+          "D. Chủ nghĩa đế quốc thực hiện chiến lược “Diễn biến hòa bình” trên thế giới"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai2", code: "Câu 15",
+        q: "Một trong những nội dung tư tưởng Hồ Chí Minh về vấn đề dân tộc và giải quyết vấn đề dân tộc?",
+        options: [
+          "A. Khắc phục tàn dư tư tưởng phân biệt, kỳ thị dân tộc, tư tưởng dân tộc lớn, dân tộc hẹp hòi",
+          "B. Xây dựng quan hệ sâu sắc, tốt đẹp, phong phú, hài hòa giữa các dân tộc",
+          "C. Thiết lập và mở rộng mối quan hệ khăng khít, gắn bó với các quốc gia, dân tộc trên thế giới",
+          "D. Xây dựng tình đoàn kết hữu nghị, bình đẳng, tôn trọng và giúp đỡ nhau cùng phát triển"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai2", code: "Câu 16",
+        q: "Một trong những đặc điểm của các dân tộc ở Việt Nam là các dân tộc ở nước ta có quy mô dân số và?",
+        options: [
+          "A. Trình độ phát triển không đồng đều",
+          "B. Trình độ phát triển khá đồng đều",
+          "C. Trình độ phát triển còn hạn chế",
+          "D. Trình độ phát triển đồng đều"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai2", code: "Câu 17",
+        q: "Một trong những quan điểm, chính sách dân tộc của Đảng, Nhà nước ta là?",
+        options: [
+          "A. Vấn đề dân tộc và đoàn kết các dân tộc có vị trí chiến lược lâu dài trong sự nghiệp cách mạng Việt Nam",
+          "B. Vấn đề dân tộc và đoàn kết dân tộc có ý nghĩa sâu sắc trong sự nghiệp cách mạng Việt Nam",
+          "C. Vấn đề dân tộc và đoàn kết dân tộc gắn liền với quá trình xây dựng và phát triển của cách mạng Việt Nam",
+          "D. Vấn đề dân tộc và đoàn kết dân tộc đi đôi với cải tạo xã hội cũ, xây dựng xã hội mới, xã hội văn minh, tốt đẹp"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai2", code: "Câu 18",
+        q: "Một trong những quan điểm, chính sách dân tộc của Đảng, Nhà nước ta là?",
+        options: [
+          "A. Thực hiện chính sách ưu tiên trong đào tạo, bồi dưỡng cán bộ, trí thức là người dân tộc thiểu số",
+          "B. Ưu tiên trong giáo dục cán bộ, nhân lực, vật lực cho các địa phương vùng đồng bào các dân tộc thiểu số",
+          "C. Tập trung phát triển nhanh về văn hóa - xã hội cho các địa phương vùng đồng bào các dân tộc thiểu số",
+          "D. Thực hiện tốt các chính sách, nhất là chính sách dân số, kế hoạch hóa gia đình cho đồng bào các dân tộc thiểu số"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai2", code: "Câu 19",
+        q: "Có mấy giải pháp đấu tranh phòng, chống sự lợi dụng vấn đề dân tộc, tôn giáo chống phá cách mạng Việt Nam của các thế lực thù địch?",
+        options: [
+          "A. 3 Giải pháp.",
+          "B. 4 Giải pháp.",
+          "C. 5 Giải pháp.",
+          "D. 6 Giải pháp."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai2", code: "Câu 20",
+        q: "Tôn trọng tự do tín ngưỡng là phải không ngừng tạo điều kiện cho quần chúng phát triển, tiến bộ về mọi mặt, bài trừ mê tín dị đoan, bảo đảm cho?",
+        options: [
+          "A. Tín đồ, chức sắc tôn giáo hoạt động theo đúng pháp luật",
+          "B. Đồng bào tôn giáo tự do, bình đẳng trước pháp luật",
+          "C. Giáo sỹ, tín đồ tôn giáo ngày càng phát triển bền vững",
+          "D. Tôn giáo đoàn kết, phát triển theo kịp thế giới"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai2", code: "Câu 21",
+        q: "Theo quan điểm của chủ nghĩa Mác-Lênin, vấn đề dân tộc là?",
+        options: [
+          "A. Vấn đề chiến lược của cách mạng XHCN",
+          "B. Vấn đề quan trọng của cách mạng XHCN",
+          "C. Vấn đề cần thiết của cách mạng XHCN",
+          "D. Vấn đề sách lược của cách mạng XHCN"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai2", code: "Câu 22",
+        q: "Một trong những nội dung giải quyết vấn đề dân tộc theo quan điểm của Lênin?",
+        options: [
+          "A. Các dân tộc hoàn toàn bình đẳng",
+          "B. Các dân tộc phải ly khai, tự trị",
+          "C. Các dân tộc phải phân chia đẳng cấp",
+          "D. Các dân tộc phải có nền văn hóa chung"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai2", code: "Câu 23",
+        q: "Một trong những giải pháp cơ bản đấu tranh phòng chống các thế lực thù địch lợi dụng vấn đề dân tộc, tôn giáo là?",
+        options: [
+          "A. Chăm lo nâng cao đời sống vật chất, tinh thần của đồng bào các dân tộc, các tôn giáo",
+          "B. Tạo điều kiện cho đồng bào các dân tộc, tôn giáo thực hiện tốt nghĩa vụ đối với đất nước",
+          "C. Chú trọng công tác thuyết phục đối với các già làng, trưởng bản, chức sắc tôn giáo",
+          "D. Kịp thời phát hiện, ngăn chặn đối phó có hiệu quả đối với những lực lượng phản động"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai2", code: "Câu 24",
+        q: "Lĩnh vực trọng yếu mà các thế lực thù địch lợi dụng, lấy đó làm “ngòi nổ” để chống phá cách mạng Việt Nam là?",
+        options: [
+          "A. Vấn đề dân tộc, tôn giáo",
+          "B. Vấn đề diễn biến hòa bình",
+          "C. Vấn đề bạo loạn lật đổ",
+          "D. Vấn đề dân chủ, nhân quyền"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai2", code: "Câu 25",
+        q: "Quyền tự do tín ngưỡng tôn giáo, được hiểu là?",
+        options: [
+          "A. Mọi người đều được tự do theo hoặc không theo tôn giáo",
+          "B. Mọi người đều được tự do thờ cúng hoặc không thờ cúng",
+          "C. Mọi người đều được tự do tin hay không tin ở thần linh",
+          "D. Mọi người đều được tự do cầu trời, cầu tự cho mình"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai2", code: "Câu 26",
+        q: "Tăng cường công tác đào tạo, bồi dưỡng cán bộ làm công tác tôn giáo, là một trong những nội dung?",
+        options: [
+          "A. Chính sách tôn giáo của Đảng, Nhà nước ta",
+          "B. Quan điểm tôn giáo của chủ nghĩa Mác - Lênin",
+          "C. Quan điểm tôn giáo của Đảng, Nhà nước ta",
+          "D. Chính sách tôn giáo của Chủ nghĩa Mác - Lênin"
+        ],
+        ans: 0
+      },
+
+      // ==================== BÀI 3 (25 CÂU) ====================
+      {
+        lesson: "bai3", code: "Câu 01",
+        q: "Theo Luật Bảo vệ môi trường năm 2020 thì thành phần môi trường bao gồm?",
+        options: [
+          "A. Các yếu tố vật chất tự nhiên và nhân tạo",
+          "B. Các yếu tố vật chất tự nhiên và xã hội",
+          "C. Các yếu tố vật chất nhân tạo và xã hội",
+          "D. Các yếu tố vật chất tự nhiên, nhân tạo và xã hội"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai3", code: "Câu 02",
+        q: 'Khái niệm "Môi trường" được tạo thành từ những yếu tố cốt lõi nào?',
+        options: [
+          "A. Bao gồm các yếu tố vật chất tự nhiên xuất hiện sẵn có trên Trái Đất.",
+          "B. Các yếu tố vật chất tự nhiên và nhân tạo quan hệ mật thiết với nhau, bao quanh con người.",
+          "C. Bao gồm các công trình nhân tạo do con người xây dựng.",
+          "D. Các hình thái văn hóa phi vật chất và thể chế chính trị của quốc gia."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai3", code: "Câu 03",
+        q: "Nội dung nào sau đây không thuộc về khái niệm hoạt động bảo vệ môi trường theo quy định của pháp luật?",
+        options: [
+          "A. Khắc phục ô nhiễm, suy thoái môi trường và cải thiện chất lượng môi trường.",
+          "B. Phòng ngừa, dự báo và hạn chế các tác động xấu từ con người đến thiên nhiên.",
+          "C. Khai thác tối đa các nguồn tài nguyên khoáng sản nhằm phục vụ cho phát triển kinh tế.",
+          "D. Sử dụng hợp lý tài nguyên thiên nhiên, bảo tồn đa dạng sinh học và ứng phó biến đổi khí hậu."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai3", code: "Câu 04",
+        q: "Quy chuẩn môi trường, tiêu chuẩn môi trường là?",
+        options: [
+          "A. Cơ sở pháp lý cho việc xác định có vi phạm pháp luật về môi trường hay không",
+          "B. Điều kiện pháp lý để cơ quan bảo vệ pháp luật xử phạt tổ chức, cá nhân vi phạm",
+          "C. Trách nhiệm pháp lý để tòa án áp dụng đối với các cá nhân, tổ chức vi phạm",
+          "D. Nguyên tắc pháp lý để cho mọi cá nhân, tổ chức chấp hành và tuân thủ"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai3", code: "Câu 05",
+        q: "Đạo luật chuyên ngành có hiệu lực pháp lý cao nhất điều chỉnh các quan hệ xã hội về bảo vệ môi trường ở nước ta hiện nay là?",
+        options: [
+          "A. Luật Tài nguyên, môi trường biển và hải đảo.",
+          "B. Luật Bảo vệ môi trường năm 2020.",
+          "C. Luật Đa dạng sinh học.",
+          "D. Bộ luật Dân sự (chương về Môi trường)."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai3", code: "Câu 06",
+        q: "Hình thức xử lý vi phạm pháp luật trong lĩnh vực bảo vệ môi trường, bao gồm?",
+        options: [
+          "A. Xử lý hình sự, xử lý vi phạm hành chính, xử lý trách nhiệm dân sự",
+          "B. Xử lý hình sự, xử lý phạt tù, xử lý phạt tiền",
+          "C. Xử lý vi phạm hành chính, xử lý phạt tiền, bồi thường",
+          "D. Xử lý trách nhiệm dân sự, buộc khôi phục trạng thái ban đầu"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai3", code: "Câu 07",
+        q: "Khi phát hiện một thông tin, bài viết hoặc chiến dịch kêu gọi bảo vệ động vật hoang dã, trồng cây xanh từ các nguồn uy tín trên không gian mạng, sinh viên nên ứng xử như thế nào để thể hiện trách nhiệm của mình?",
+        options: [
+          "A. Viết bài kêu gọi quyên góp tài chính và chủ động đính kèm số tài khoản ngân hàng cá nhân của mình ở phần bình luận để thu gom tiền từ thiện giúp chiến dịch.",
+          "B. Tích cực tương tác, chia sẻ (share) bài viết gốc để lan tỏa thông điệp xanh đến cộng đồng; đồng thời chủ động tham gia bằng các hành động thực tế phù hợp với khả năng.",
+          "C. Tải toàn bộ hình ảnh, nội dung bài viết về máy, chỉnh sửa cắt bỏ logo nguồn cũ rồi đăng lại trên trang cá nhân để tăng tương tác thu hút bạn bè.",
+          "D. Sao chép đường liên kết (link) của chiến dịch và gửi vào các hội nhóm ở trường để yêu cầu các thành viên tham gia."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai3", code: "Câu 08",
+        q: "Một trong những nguyên nhân điều kiện khách quan dẫn đến vi phạm pháp luật về môi trường là do?",
+        options: [
+          "A. Áp lực tăng trưởng kinh tế",
+          "B. Sự phát triển quá nhanh của nền kinh tế",
+          "C. Quy chuẩn môi trường, tiêu chuẩn môi trường quá khắt khe",
+          "D. Các khu đô thị và khu dân cư ngày càng nhiều"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai3", code: "Câu 09",
+        q: "Muốn nâng cao hiệu quả nhận thức của cộng đồng đối với đường lối chính sách của Đảng, pháp luật của Nhà nước về bảo vệ môi trường, cần chú trọng biện pháp nào?",
+        options: [
+          "A. Biện pháp pháp luật",
+          "B. Biện pháp tổ chức hành chính",
+          "C. Biện pháp tuyên truyền, giáo dục",
+          "D. Biện pháp khoa học công nghệ"
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai3", code: "Câu 10",
+        q: "Phòng, chống vi phạm pháp luật về bảo vệ môi trường nhằm?",
+        options: [
+          "A. Ngăn chặn, hạn chế tình trạng vi phạm pháp luật về bảo vệ môi trường",
+          "B. Ngăn chặn nguy cơ, điều kiện vi phạm pháp luật về bảo vệ môi trường",
+          "C. Duy trì môi trường trong sạch và giữ nguyên hiện trạng môi trường",
+          "D. Bảo đảm cho sự phát triển ổn định, bền vững kinh tế - xã hội của đất nước"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai3", code: "Câu 11",
+        q: "Mục tiêu cốt lõi của Luật Bảo vệ môi trường năm 2020 đối với việc quản lý, giảm thiểu chất thải nhựa trong các hoạt động sản xuất, kinh doanh và sinh hoạt là gì?",
+        options: [
+          "A. Cấm tuyệt đối việc sản xuất tất cả các sản phẩm làm từ nhựa.",
+          "B. Giảm thiểu, tái sử dụng, tái chế và xử lý chất thải nhựa; hạn chế sử dụng sản phẩm nhựa dùng một lần và túi ni lông khó phân hủy.",
+          "C. Khuyến khích người dân đốt chất thải nhựa tại nhà để giảm thiểu khối lượng rác chôn lấp.",
+          "D. Chuyển toàn bộ chất thải nhựa phát sinh để tạo ra năng lượng tái tạo thông qua nhà máy điện rác."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai3", code: "Câu 12",
+        q: "Hành vi nào sau đây trong đánh bắt hải sản gây nguy hại cho môi trường?",
+        options: [
+          "A. Dùng xung điện khai thác hải sản",
+          "B. Dùng tàu thuyền nhỏ khai thác hải sản",
+          "C. Dùng thuyền câu hải sản",
+          "D. Sử dụng tàu công suất lớn để khai thác hải sản."
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai3", code: "Câu 13",
+        q: "Chọn đáp án đúng nhất hiện tượng chặt phá rừng còn xảy ra ở nhiều nơi rất nghiêm trọng do?",
+        options: [
+          "A. Xử lý vi phạm pháp luật về môi trường chưa thực sự nghiêm minh",
+          "B. Chưa được tuyên truyền nhắc nhở",
+          "C. Cuộc sống mưu sinh của một số người",
+          "D. Địa phương chưa quan tâm đến bảo vệ môi trường"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai3", code: "Câu 14",
+        q: "Biện pháp chủ yếu để phát hiện hành vi vi phạm môi trường cần?",
+        options: [
+          "A. Tăng cường công tác thanh tra, kiểm tra cơ sở, địa bàn có nguy cơ gây ô nhiễm môi trường",
+          "B. Thông qua báo cáo của các cơ sở về môi trường",
+          "C. Đặt camera quan sát",
+          "D. Căn cứ vào phát hiện của quần chúng"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai3", code: "Câu 15",
+        q: 'Điền cụm từ vào chỗ trống: Pháp luật quy định các “...” của các cơ quan, tổ chức và cá nhân tham gia bảo vệ môi trường?',
+        options: [
+          "A. Chức năng, nhiệm vụ, quyền hạn",
+          "B. Chức năng, quyền hạn",
+          "C. Nhiệm vụ, chức năng và quyền xử phạt",
+          "D. Quyền hạn áp dụng quy định xử phạt"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai3", code: "Câu 16",
+        q: "Pháp luật về bảo vệ môi trường giữ vai trò như thế nào trong việc quản lý xã hội?",
+        options: [
+          "A. Là giải pháp để áp dụng khi xảy ra các sự cố thiên tai nghiêm trọng.",
+          "B. Là công cụ để nâng cao ý thức bảo vệ môi trường.",
+          "C. Là công cụ quản lý vĩ mô, quy định các chuẩn mực hành vi và tạo cơ sở pháp lý để bảo vệ hệ sinh thái.",
+          "D. Là văn bản để khuyến khích mọi công dân tham gia bảo vệ môi trường."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai3", code: "Câu 17",
+        q: "Trách nhiệm của sinh viên trong phòng, chống vi phạm về bảo vệ môi trường?",
+        options: [
+          "A. Nắm vững các quy định của pháp luật phòng, chống vi phạm pháp luật về bảo vệ môi trường",
+          "B. Xây dựng ý thức trách nhiệm trong các hoạt động bảo vệ môi trường như sử dụng tiết kiệm, có hiệu quả các nguồn tài nguyên (nước, năng lượng,...)",
+          "C. Xây dựng văn hóa ứng xử, ý thức trách nhiệm với môi trường như sống thân thiện với môi trường xung quanh",
+          "D. Tham gia tích cực và hưởng ứng các chương trình, hành động về bảo vệ môi trường do Nhà nước, các Bộ ngành, địa phương và nhà trường phát động"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai3", code: "Câu 18",
+        q: "Việc pháp luật quy định đồng thời các hệ thống chế tài hình sự, hành chính, dân sự và kinh tế đối với hành vi xâm hại môi trường nhằm mục đích quản lý xã hội nào sau đây?",
+        options: [
+          "A. Thay thế các quy trình giám sát kỹ thuật bằng việc tối đa hóa mức hình phạt đối với mọi hành vi làm phát sinh chất thải.",
+          "B. Tạo cơ chế tác động toàn diện, vừa răn đe nghiêm khắc bằng chế tài công quyền (hình sự, hành chính), vừa bảo đảm bù đắp thiệt hại vật chất và lợi ích kinh tế (dân sự, kinh tế).",
+          "C. Tạo hành lang pháp lý để chủ thể vi phạm có thể chủ động sử dụng tiền phạt hành chính nhằm bù đắp cho những thiệt hại do mình gây ra",
+          "D. Tạo cơ sở để áp đặt các mức phạt kinh tế."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai3", code: "Câu 19",
+        q: "Luật Bảo vệ môi trường quy định việc bảo vệ môi trường nhằm mục đích gì?",
+        options: [
+          "A. Bảo vệ sức khỏe của nhân dân, phục vụ sự phát triển bền vững của đất nước",
+          "B. Bảo vệ phát triển kinh tế rừng",
+          "C. Bảo vệ môi trường không khí",
+          "D. Bảo vệ phát triển kinh tế biển"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai3", code: "Câu 20",
+        q: "Để nâng cao hiệu quả công tác đấu tranh phòng, chống tội phạm và vi phạm pháp luật về môi trường cần phải?",
+        options: [
+          "A. Quan trắc môi trường",
+          "B. Hoàn thiện cơ chế, chính sách, hệ thống pháp luật về bảo vệ tài nguyên và môi trường",
+          "C. Thực hiện trồng nhiều cây xanh",
+          "D. Thu gom rác thải sinh hoạt"
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai3", code: "Câu 21",
+        q: "Để phát hiện hành vi vi phạm môi trường cần phải?",
+        options: [
+          "A. Đặt camera quan sát",
+          "B. Thông qua báo cáo của các cơ sở về môi trường",
+          "C. Tăng cường công tác thanh tra, kiểm tra cơ sở, địa bàn có nguy cơ gây ô nhiễm môi trường",
+          "D. Căn cứ vào phát hiện của quần chúng"
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai3", code: "Câu 22",
+        q: "Để phòng ngừa, đấu tranh chống tội phạm và vi phạm pháp luật về môi trường cần phải?",
+        options: [
+          "A. Dựa vào tinh thần tự giác của người dân",
+          "B. Phụ thuộc vào sự quản lý về môi trường của cơ sở",
+          "C. Dựa vào lực lượng thanh niên tình nguyện",
+          "D. Đẩy mạnh công tác tuyên truyền, giáo dục nâng cao nhận thức và trách nhiệm của mọi công dân"
+        ],
+        ans: 3
+      },
+      {
+        lesson: "bai3", code: "Câu 23",
+        q: "Một trong những giải pháp đấu tranh phòng chống những hành vi vi phạm và tội phạm về môi trường?",
+        options: [
+          "A. Xử phạt hành chính tội phạm về môi trường",
+          "B. Tiếp nhận báo cáo về môi trường của cơ sở sản xuất",
+          "C. Khuyến khích cá nhân tố cáo vi phạm về môi trường",
+          "D. Tổ chức thực hiện triệt để các chủ trương, chính sách của Đảng, pháp luật của Nhà nước về bảo vệ môi trường."
+        ],
+        ans: 3
+      },
+      {
+        lesson: "bai3", code: "Câu 24",
+        q: "Hoạt động bảo vệ môi trường của sinh viên trong nhà trường được nhìn nhận như thế nào dưới góc độ trách nhiệm công dân?",
+        options: [
+          "A. Có trách nhiệm, nghĩa vụ tham gia khi nhà trường phát động phong trào “xanh, sạch, đẹp\".",
+          "B. Là trách nhiệm, nghĩa vụ công dân và là tiêu chí quan trọng để đánh giá ý thức rèn luyện, đạo đức của sinh viên.",
+          "C. Là trách nhiệm, nghĩa vụ của bộ phận vệ sinh môi trường.",
+          "D. Có trách nhiệm thực hiện khi được nhà trường chọn làm tiêu chí quan trọng để đánh giá ý thức rèn luyện, đạo đức của sinh viên."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai3", code: "Câu 25",
+        q: "Khi ở trong khuôn viên nhà trường, hành động nào sau đây của sinh viên thể hiện sự hiểu biết và trách nhiệm cao nhất trong việc xử lý rác thải sinh hoạt?",
+        options: [
+          "A. Gom tất cả rác hữu cơ, rác vô cơ và chất thải nhựa vào nơi đúng quy định.",
+          "B. Chủ động phân loại rác (rác tái chế, rác hữu cơ, rác còn lại) trước khi bỏ vào các thùng rác chuyên dụng của nhà trường.",
+          "C. Chủ động dọn dẹp hàng ngày.",
+          "D. Gom tất cả rác hữu cơ, rác vô cơ và chất thải nhựa để đốt."
+        ],
+        ans: 1
+      },
+
+      // ==================== BÀI 4 (25 CÂU) ====================
+      {
+        lesson: "bai4", code: "Câu 01",
+        q: "Pháp luật về bảo đảm trật tự, an toàn giao thông được hiểu là gì?",
+        options: [
+          "A. Hệ thống các quy định nội bộ của ngành giao thông vận tải áp dụng riêng cho các doanh nghiệp vận tải.",
+          "B. Toàn bộ các quy tắc đạo đức tự nguyện của người dân khi tham gia giao thông trên đường.",
+          "C. Hệ thống các quy phạm pháp luật do cơ quan nhà nước có thẩm quyền ban hành nhằm điều chỉnh các quan hệ xã hội phát sinh trong hoạt động giao thông.",
+          "D. Chỉ thị hành chính nội bộ của lực lượng Cảnh sát giao thông nhằm phân luồng xe cộ hằng ngày."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai4", code: "Câu 02",
+        q: "Pháp luật về bảo đảm trật tự, an toàn giao thông là gì?",
+        options: [
+          "A. Là một bộ phận của hệ thống pháp luật hành chính nhà nước.",
+          "B. Là hệ thống pháp luật của nhà nước qui định về an toàn giao thông.",
+          "C. Là một bộ phận của pháp luật qui định các hành vi vi phạm giao thông.",
+          "D. Là một bộ phận của pháp luật nước Cộng hòa xã hội chủ nghĩa Việt Nam."
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai4", code: "Câu 03",
+        q: "Đáp án nào sau đây là đầy đủ và chính xác nhất về mặt khách quan của vi phạm pháp luật về bảo đảm trật tự, an toàn giao thông?",
+        options: [
+          "A. Chỉ bao gồm hành vi hành động (như chạy quá tốc độ) và hậu quả thiệt hại thực tế.",
+          "B. Bắt buộc phải có đủ 3 yếu tố: Hành vi vi phạm, hậu quả nghiêm trọng và quan hệ nhân quả.",
+          "C. Gồm hành vi vi phạm (hành động/không hành động); vi phạm hành chính chỉ cần có hành vi, còn hình sự thường phải có hậu quả.",
+          "D. Là diễn biến tâm lý bên trong của người vi phạm bộc lộ ra bên ngoài thông qua lỗi cố ý."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai4", code: "Câu 04",
+        q: "Một trong những nguyên nhân, điều kiện dẫn đến vi phạm pháp luật về trật tự, an toàn giao thông?",
+        options: [
+          "A. Tác động tiêu cực của các yếu tố thiên nhiên, môi trường đối với người tham gia giao thông",
+          "B. Hệ thống pháp luật còn chưa đủ chặt, đủ mạnh để răn đe",
+          "C. Hiện tượng tiêu cực mang tính phổ biến",
+          "D. Ý thức tự giác của người tham gia giao thông chưa cao"
+        ],
+        ans: 3
+      },
+      {
+        lesson: "bai4", code: "Câu 05",
+        q: "Phòng chống vi phạm pháp luật về bảo đảm trật tự, an toàn giao thông là?",
+        options: [
+          "A. Hoạt động của cơ quan Nhà nước, các tổ chức xã hội và công dân",
+          "B. Hoạt động của các tổ chức",
+          "C. Hoạt động của cơ quan Nhà nước",
+          "D. Hoạt động của cá nhân"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai4", code: "Câu 06",
+        q: "Cơ quan hay tổ chức nào trực tiếp chỉ đạo và phân công, phân cấp cụ thể cho các bộ, ngành, cơ quan đoàn thể trong phòng ngừa tội phạm và vi phạm pháp luật về bảo đảm trật tự, an toàn giao thông?",
+        options: [
+          "A. Chính phủ, Uỷ ban nhân dân các cấp",
+          "B. Đảng cộng sản Việt Nam",
+          "C. Quốc hội, Hội đồng nhân dân các cấp",
+          "D. Bộ giao thông vận tải"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai4", code: "Câu 07",
+        q: "Lực lượng nòng cốt xung kích trong đảm bảo trật tự, an toàn giao thông là?",
+        options: [
+          "A. Công an",
+          "B. Quân đội",
+          "C. Dân quân tự vệ",
+          "D. Dân phòng"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai4", code: "Câu 08",
+        q: "Hành vi nào sau đây thể hiện đầy đủ và đúng đắn nhất trách nhiệm của sinh viên trong việc tham gia bảo đảm trật tự, an toàn giao thông (TTATGT)?",
+        options: [
+          "A. Tự giác chấp hành nghiêm chỉnh luật giao thông, tham gia các hoạt động tuyên truyền của trường và nhắc nhở mọi người xung quanh cùng thực hiện.",
+          "B. Ký cam kết không vi phạm TTATGT với nhà trường vào đầu năm học và tập trung vào việc học tập, rèn luyện.",
+          "C. Tích cực tham gia các đội thanh niên xung kích phân luồng giao thông tại cổng trường dù bản thân đôi khi vẫn vi phạm lỗi nhỏ.",
+          "D. Nghiên cứu sâu sắc các chế tài xử phạt của Luật Giao thông đường bộ để không bị vi phạm."
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai4", code: "Câu 09",
+        q: "Một trong những biện pháp phòng, chống vi phạm pháp luật về bảo đảm trật tự, an toàn tham gia giao thông là?",
+        options: [
+          "A. Tuyên truyền, phổ biến, giáo dục pháp luật về bảo đảm trật tự, an toàn giao thông cho mọi công dân",
+          "B. Tuyên truyền, phổ biến về chính sách phát triển kinh tế - xã hội",
+          "C. Tuyên truyền, phổ biến về Bộ luật hình sự hiện hành",
+          "D. Tuyên truyền về hậu quả của các hành vi vi phạm và chế tài xử lý"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai4", code: "Câu 10",
+        q: "Mục đích của công tác tuyên truyền, phổ biến, giáo dục pháp luật về bảo đảm trật tự, an toàn giao thông là?",
+        options: [
+          "A. Nâng cao ý thức chấp hành pháp luật về bảo đảm trật tự, an toàn giao thông",
+          "B. Nâng cao hiểu biết về chính sách phát triển kinh tế - xã hội của đất nước",
+          "C. Nâng cao ý thức trong giữ gìn an ninh trật tự",
+          "D. Nâng cao tinh thần đấu tranh, tố giác tội phạm"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai4", code: "Câu 11",
+        q: "Điền cụm từ vào chỗ trống: Trật tự, an toàn giao thông là trạng thái xã hội có trật tự được hình thành và điều chỉnh bởi ... trong lĩnh vực giao thông?",
+        options: [
+          "A. Các quy phạm pháp luật",
+          "B. Hệ thống văn bản pháp quy",
+          "C. Hệ thống nguyên tắc điều chỉnh hành vi",
+          "D. Ý thức công dân tham gia"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai4", code: "Câu 12",
+        q: "Cơ quan nào chịu trách nhiệm trước chính phủ trong việc thực hiện quản lý Nhà nước về đảm bảo trật tự, an toàn giao thông?",
+        options: [
+          "A. Bộ giao thông vận tải",
+          "B. Bộ công an",
+          "C. Cục quản lý đường bộ",
+          "D. Cục quản lý đường biển"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai4", code: "Câu 13",
+        q: "Nội dung nào sau đây là giải pháp trong công tác phòng, chống vi phạm pháp luật về bảo đảm trật tự, an toàn giao thông?",
+        options: [
+          "A. Nâng cao nhận thức và ý thức tự giác chấp hành pháp luật của người tham gia giao thông.",
+          "B. Đổi mới, nâng cao hiệu quả công tác tuyên truyền, phổ biến, giáo dục pháp luật.",
+          "C. Kiên quyết kiềm chế, tiếp tục làm giảm tai nạn giao thông và ùn tắc giao thông.",
+          "D. Tuyên truyền, vận động nhân dân nghiêm chỉnh chấp hành luật giao thông."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai4", code: "Câu 14",
+        q: "Nội dung nào sau đây là nguyên nhân khách quan dẫn đến các vi phạm pháp luật và tai nạn giao thông hiện nay?",
+        options: [
+          "A. Ý thức tự giác chấp hành luật giao thông của một bộ phận người dân còn kém.",
+          "B. Tâm lý chủ quan, phóng nhanh vượt ẩu, sử dụng rượu bia khi lái xe của người điều khiển phương tiện.",
+          "C. Sự gia tăng quá nhanh của phương tiện cá nhân trong khi hạ tầng giao thông chưa đáp ứng kịp thời.",
+          "D. Người tham gia giao thông chưa hiểu rõ các quy định của Luật Giao thông đường bộ."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai4", code: "Câu 15",
+        q: "Nội dung nào sau đây là nguyên nhân chủ quan hàng đầu dẫn đến các vi phạm pháp luật về bảo đảm trật tự, an toàn giao thông?",
+        options: [
+          "A. Hệ thống biển báo giao thông tại một số tuyến đường còn thiếu hoặc bố trí chưa hợp lý.",
+          "B. Thời tiết diễn biến thất thường, mưa lớn gây ngập lụt và làm giảm tầm nhìn của người lái xe.",
+          "C. Ý thức tự giác chấp hành pháp luật giao thông của một bộ phận người tham gia giao thông còn thấp.",
+          "D. Mật độ phương tiện giao thông tăng quá nhanh gây quá tải cho hệ thống cầu đường đô thị."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai4", code: "Câu 16",
+        q: "Cơ quan chịu trách nhiệm nghiên cứu phân tích, đánh giá tình trạng vi phạm pháp luật về bảo đảm trật tự, an toàn giao thông?",
+        options: [
+          "A. Bộ công an",
+          "B. Bộ quốc phòng",
+          "C. Quốc hội",
+          "D. Bộ giao thông vận tải"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai4", code: "Câu 17",
+        q: "Một trong những nội dung hợp tác giữa các chủ thể tham gia đảm bảo trật tự, an toàn giao thông là?",
+        options: [
+          "A. Phối hợp tổ chức tuyên truyền, giáo dục pháp luật về bảo đảm trật tự, an toàn giao thông",
+          "B. Phối hợp trong truy tìm, vây bắt đối tượng vi phạm",
+          "C. Phối hợp trong dẫn độ đối tượng vi phạm",
+          "D. Phối hợp trong xét xử đối tượng vi phạm"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai4", code: "Câu 18",
+        q: "Điền vào chỗ còn trống: Pháp luật về đảm bảo trật tự, an toàn giao thông là ... để thực hiện chức năng quản lý Nhà nước?",
+        options: [
+          "A. Công cụ pháp lý",
+          "B. Công cụ đấu tranh",
+          "C. Công cụ thực thi",
+          "D. Công cụ xử lý"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai4", code: "Câu 19",
+        q: "Nội dung nào sau đây thuộc về quy tắc giao thông trong nội dung cơ bản của pháp luật về bảo đảm trật tự, an toàn giao thông?",
+        options: [
+          "A. Quy định về độ tuổi và thủ tục cấp Giấy phép lái xe cho công dân.",
+          "B. Quy định về niên hạn sử dụng và tiêu chuẩn đăng kiểm định kỳ của xe ô tô.",
+          "C. Quy định về tốc độ tối đa cho phép và khoảng cách an toàn giữa các xe trên đường.",
+          "D. Quy định về mức phạt tiền và hình thức tước quyền sử dụng giấy phép lái xe."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai4", code: "Câu 20",
+        q: 'Hành vi "Đua xe trái phép gây tai nạn nghiêm trọng hoặc tổ chức đua xe trái phép" được nhận thức là loại vi phạm nào?',
+        options: [
+          "A. Vi phạm kỷ luật quân đội nội bộ.",
+          "B. Vi phạm dân sự về tranh chấp tài sản.",
+          "C. Tội phạm hình sự về trật tự, an toàn giao thông.",
+          "D. Vi phạm hành chính nhẹ, chỉ cần nhắc nhở."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai4", code: "Câu 21",
+        q: "Pháp luật về bảo đảm trật tự, an toàn giao thông giữ vai trò như thế nào đối với các lực lượng chức năng?",
+        options: [
+          "A. Là văn bản mang tính chất tham khảo, không bắt buộc lực lượng chức năng áp dụng.",
+          "B. Giúp lực lượng chức năng tự ý thay đổi các mức phạt tùy theo hoàn cảnh kinh tế.",
+          "C. Là cơ sở pháp lý vững chắc để kiểm tra, giám sát và xử lý nghiêm minh các hành vi vi phạm.",
+          "D. Thay thế hoàn toàn cho công tác tuyên truyền ý thức giao thông của người dân."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai4", code: "Câu 22",
+        q: "Một trong những vai trò cốt lõi của pháp luật về bảo đảm TTATGT đối với người tham gia giao thông là?",
+        options: [
+          "A. Ép buộc mọi công dân phải sở hữu tất cả các loại bằng lái xe cùng một lúc.",
+          "B. Quy định chuẩn mực hành vi, xác định rõ quyền và nghĩa vụ của mọi đối tượng khi tham gia giao thông.",
+          "C. Khuyến khích người dân tự ý thay đổi biển số xe theo sở thích cá nhân.",
+          "D. Ban hành các quy định ưu tiên cho người có phương tiện đắt tiền hơn."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai4", code: "Câu 23",
+        q: "Mục đích cao nhất của việc phát huy vai trò của pháp luật về bảo đảm trật tự, an toàn giao thông là gì?",
+        options: [
+          "A. Nhằm tăng tối đa nguồn thu ngân sách nhà nước thông qua tiền xử phạt hành chính.",
+          "B. Nhằm cấm tuyệt đối việc sử dụng các phương tiện giao thông cá nhân tại đô thị.",
+          "C. Bảo vệ tính mạng, sức khỏe và tài sản của nhân dân, giảm thiểu tai nạn và ùn tắc giao thông.",
+          "D. Phục vụ riêng cho mục đích hành quân thần tốc của lực lượng quân đội thời chiến."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai4", code: "Câu 24",
+        q: "Một hành vi vi phạm pháp luật về bảo đảm trật tự, an toàn giao thông bắt buộc phải có dấu hiệu nào dưới đây về mặt tâm lý?",
+        options: [
+          "A. Phải được sự đồng thuận của người đi cùng trên xe.",
+          "B. Có lỗi của chủ thể thực hiện hành vi (cố ý hoặc vô ý).",
+          "C. Phải có sự chứng kiến trực tiếp của lực lượng Cảnh sát giao thông.",
+          "D. Chủ thể thực hiện phải có bằng đại học chuyên ngành giao thông."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai4", code: "Câu 25",
+        q: 'Điểm khác biệt lớn nhất để phân biệt một vụ "vi phạm hành chính về giao thông" với một "tội phạm hình sự về giao thông" là gì?',
+        options: [
+          "A. Địa điểm xảy ra hành vi vi phạm (ở nông thôn hay thành thị).",
+          "B. Thương hiệu và giá trị của phương tiện giao thông được sử dụng.",
+          "C. Tính chất, mức độ nguy hiểm cho xã hội và hậu quả thiệt hại do hành vi đó gây ra.",
+          "D. Thời gian thực hiện hành vi (vào ban ngày hay ban đêm)."
+        ],
+        ans: 2
+      },
+
+      // ==================== BÀI 5 (25 CÂU) ====================
+      {
+        lesson: "bai5", code: "Câu 01",
+        q: "Nhân phẩm của một con người được hiểu như thế nào là đúng đắn nhất dưới góc độ pháp lý?",
+        options: [
+          "A. Là mức độ uy tín, vị thế xã hội và giá trị tài sản mà một cá nhân sở hữu và đóng góp được cho cộng đồng.",
+          "B. Là toàn bộ phẩm chất đạo đức, giá trị tinh thần của một cá nhân được xã hội thừa nhận và tôn trọng.",
+          "C. Là sự tự đánh giá của bản thân cá nhân về danh tiếng, phẩm giá và lòng tự trọng của chính mình.",
+          "D. Là cách nhìn nhận, đánh giá mang tính chủ quan của những người xung quanh đối với một cá nhân."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai5", code: "Câu 02",
+        q: "Danh dự của một cá nhân được hiểu như thế nào là đúng đắn nhất dưới góc độ pháp lý?",
+        options: [
+          "A. Là sự tự tôn, tự đánh giá cao của bản thân cá nhân về phẩm giá và năng lực của chính mình.",
+          "B. Là toàn bộ phẩm chất đạo đức bẩm sinh bên trong con người mà không phụ thuộc vào dư luận xã hội.",
+          "C. Là sự đánh giá mang tính khách quan từ dư luận xã hội đối với một cá nhân dựa trên các phẩm chất và hành vi của họ.",
+          "D. Là địa vị xã hội, chức vụ và khối lượng tài sản hợp pháp mà cá nhân đó cống hiến cho xã hội."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai5", code: "Câu 03",
+        q: "Theo Hiến pháp năm 2013 và pháp luật Việt Nam, quyền được bảo vệ danh dự, nhân phẩm là quyền của những ai?",
+        options: [
+          "A. Chỉ là quyền của những người có chức vụ, quyền hạn cao trong cơ quan nhà nước.",
+          "B. Chỉ dành riêng cho những công dân đã trưởng thành (từ đủ 18 tuổi trở lên).",
+          "C. Mọi người đều có quyền bất khả xâm phạm về thân thể, được pháp luật bảo hộ về sức khỏe, danh dự và nhân phẩm.",
+          "D. Chỉ bảo vệ những người nổi tiếng, có sức ảnh hưởng lớn trên mạng xã hội."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai5", code: "Câu 04",
+        q: '“Gắn giáo dục kiến thức văn hoá với giáo dục kỹ năng sống” để phụ nữ và trẻ em?',
+        options: [
+          "A. Tự bảo vệ mình trước các nguy cơ bị xâm hại",
+          "B. Tham gia công tác phòng, chống tội phạm",
+          "C. Tránh xa những đối tượng có tiền án, tiền sự",
+          "D. Nâng cao nhận thức về thái độ và trách nhiệm xã hội"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai5", code: "Câu 05",
+        q: '“Chú trọng giáo dục đạo đức lẫn kiến thức; lồng ghép nội dung giáo dục giới tính, sức khỏe sinh sản cho học sinh” là trách nhiệm chính của?',
+        options: [
+          "A. Nhà trường",
+          "B. Gia đình",
+          "C. Xã hội",
+          "D. Đoàn thể"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai5", code: "Câu 06",
+        q: "Nhân phẩm là phẩm chất, giá trị của một con người được?",
+        options: [
+          "A. Pháp luật bảo vệ",
+          "B. Cộng đồng bảo vệ",
+          "C. Tôn giáo bảo vệ",
+          "D. Quần chúng nhân dân bảo vệ"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai5", code: "Câu 07",
+        q: "Một trong những yếu tố hình thành nguyên nhân, điều kiện của tình trạng phạm tội xúc phạm danh dự, nhân phẩm?",
+        options: [
+          "A. Phân hóa giàu nghèo",
+          "B. Bất bình đẳng giới",
+          "C. Tệ nạn xã hội phát triển",
+          "D. Giá trị vật chất lên ngôi"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai5", code: "Câu 08",
+        q: "Làm tốt công tác phòng ngừa tội phạm mang ý nghĩa?",
+        options: [
+          "A. Giữ vững an ninh quốc gia, trật tự an toàn xã hội",
+          "B. Nâng cao chất lượng đời sống một bộ phận người dân",
+          "C. Góp phần phát triển kinh tế - xã hội ở một số khu vực",
+          "D. Xóa bỏ hủ tục lạc hậu"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai5", code: "Câu 09",
+        q: "Công dân với tư cách là?",
+        options: [
+          "A. Chủ thể trong phòng chống tội phạm",
+          "B. Khách thể trong phòng chống tội phạm",
+          "C. Điều tra trong phòng chống tội phạm",
+          "D. Xét xử trong phòng chống tội phạm"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai5", code: "Câu 10",
+        q: "Hành vi cố ý bịa đặt hoặc loan truyền những điều biết rõ là sai sự thật nhằm xúc phạm nghiêm trọng nhân phẩm, danh dự hoặc gây thiệt hại đến quyền, lợi ích hợp pháp của người khác cấu thành tội danh gì trong Bộ luật Hình sự?",
+        options: [
+          "A. Tội làm nhục người khác.",
+          "B. Tội vu khống (Điều 156 Bộ luật Hình sự 2015).",
+          "C. Tội đe dọa giết người.",
+          "D. Tội vô ý gây thương tích."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai5", code: "Câu 11",
+        q: "Bộ Luật Hình sự quy định về?",
+        options: [
+          "A. Tội phạm và hình phạt",
+          "B. Nhà nước và tội phạm",
+          "C. Cơ quan chức năng và tội phạm",
+          "D. Pháp luật hình sự và tội phạm"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai5", code: "Câu 12",
+        q: "Nội dung nào sau đây phản ánh đúng và đầy đủ nhất vai trò chủ yếu của Bộ luật Hình sự?",
+        options: [
+          "A. Là văn bản pháp lý duy nhất quy định các hình thức xử phạt vi phạm hành chính đối với người có hành vi trái pháp luật.",
+          "B. Là công cụ pháp lý sắc bén để bảo vệ các quyền vĩ mô của Nhà nước mà không điều chỉnh quyền lợi của cá nhân công dân.",
+          "C. Là công cụ sắc bén để bảo vệ các quyền, lợi ích hợp pháp của Nhà nước, tổ chức, công dân và đấu tranh phòng, chống tội phạm.",
+          "D. Là quy trình nghiệp vụ chi tiết hướng dẫn lực lượng Công an thực hiện các hoạt động bắt giữ và điều tra tội phạm."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai5", code: "Câu 13",
+        q: "Tội làm nhục người khác là?",
+        options: [
+          "A. Hành vi xâm phạm đến quyền được bảo hộ về nhân phẩm, danh dự của người khác",
+          "B. Lăng mạ, sỉ nhục, chửi bới... làm họ bị xúc phạm về nhân phẩm, danh dự",
+          "C. Hành vi xúc phạm về thể xác ảnh hưởng đến uy tín, danh dự của họ trước tập thể",
+          "D. Có hành vi làm cho người khác bị mất nhân phẩm, danh dự trước tập thể."
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai5", code: "Câu 14",
+        q: "Hành vi xâm phạm nhân phẩm, danh dự của con người là?",
+        options: [
+          "A. Làm cho người đó bị xúc phạm, tổn thương về tinh thần và xấu hổ",
+          "B. Xâm phạm quyền được tôn trọng và bảo vệ về nhân phẩm, danh dự người khác",
+          "C. Xâm phạm về nhân phẩm, danh dự được pháp luật bảo vệ",
+          "D. Hành vi nguy hiểm cho xã hội được quy định trong Bộ luật hình sự sửa đổi, bổ sung năm 2017"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai5", code: "Câu 15",
+        q: "Khi thực hiện hành vi vu khống hoặc làm nhục người khác mà sử dụng mạng máy tính, mạng viễn thông, phương tiện điện tử (như Facebook, TikTok, Zalo) làm công cụ phát tán, khung hình phạt sẽ thay đổi như thế nào?",
+        options: [
+          "A. Được giảm nhẹ hình phạt vì chỉ là hành vi ảo trên mạng xã hội.",
+          "B. Không thay đổi so với việc vi phạm ngoài đời thực.",
+          "C. Là tình tiết định khung tăng nặng, đối mặt với mức hình phạt nghiêm khắc hơn do tốc độ phát tán và mức độ tổn thương diện rộng.",
+          "D. Chỉ bị xử phạt hành chính nhẹ bằng hình thức nhắc nhở, khóa tài khoản."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai5", code: "Câu 16",
+        q: "Để tự bảo vệ mình và phòng ngừa tối đa việc bị các đối tượng xấu lợi dụng, bôi nhọ danh dự, nhân phẩm trên không gian mạng, sinh viên không nên làm điều nào sau đây?",
+        options: [
+          "A. Tự ý đăng tải, chia sẻ các hình ảnh nhạy cảm, thông tin cá nhân chi tiết hoặc các phát ngôn mang tính kích động, xúc phạm người khác lên trang cá nhân.",
+          "B. Cài đặt các chế độ bảo mật hai lớp (2FA) và hạn chế quyền xem thông tin cá nhân từ những tài khoản lạ trên các nền tảng mạng xã hội.",
+          "C. Tìm hiểu và trang bị cho bản thân các kiến thức pháp luật cơ bản về Luật An ninh mạng và các chế tài xử lý hành vi vu khống, làm nhục người khác.",
+          "D. Kịp thời thông báo cho nhà trường, gia đình hoặc cơ quan Công an khi phát hiện tài khoản cá nhân bị giả mạo hoặc bị bôi nhọ danh dự."
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai5", code: "Câu 17",
+        q: "Hành vi nào sau đây cấu thành Tội làm nhục người khác theo quy định của Bộ luật Hình sự?",
+        options: [
+          "A. Bịa đặt và loan truyền thông tin sai sự thật rằng đồng nghiệp nhận hối lộ nhằm mục đích hạ uy tín của người đó.",
+          "B. Sử dụng lời nói thô tục, chửi bới công khai hoặc đăng hình ảnh nhạy cảm nhằm hạ thấp nhân cách, gây tổn thương tinh thần sâu sắc cho nạn nhân.",
+          "C. Nghi ngờ hàng xóm trộm cắp tài sản nên đã viết đơn trình báo gửi cơ quan Công an đề nghị điều tra, làm rõ sự việc.",
+          "D. Vô ý kể lại một câu chuyện đùa vui đời tư của bạn bè trong buổi tiệc khiến người đó cảm thấy ngượng ngùng trước đám đông."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai5", code: "Câu 18",
+        q: 'Khi phát hiện mình bị một nhóm đối tượng lập group "Anti" (tẩy chay), cắt ghép hình ảnh sai sự thật nhằm xúc phạm nghiêm trọng đến uy tín, nhân phẩm, sinh viên cần có nhận thức và cách xử lý đúng đắn nào?',
+        options: [
+          "A. Im lặng chịu đựng, tự cô lập bản thân và không dám chia sẻ với bất kỳ ai.",
+          "B. Lập tức nhắn tin chửi bới, đe dọa đánh trả hoặc thuê người đến hành hung đối phương.",
+          "C. Chụp ảnh màn hình, lưu lại các liên kết (link) làm bằng chứng; thông báo ngay cho gia đình, nhà trường và làm đơn trình báo cơ quan Công an.",
+          "D. Đăng bài viết thừa nhận mọi lời xúc phạm dù bản thân không làm việc đó để mọi chuyện nhanh qua đi."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai5", code: "Câu 19",
+        q: '“Thường xuyên tuyên truyền, vận động quần chúng nhân dân trong đấu tranh, phòng, chống tội xâm phạm nhân phẩm, danh dự của con người” là trách nhiệm của?',
+        options: [
+          "A. Cấp ủy Đảng và chính quyền",
+          "B. Cơ quan chức năng",
+          "C. Quần chúng nhân dân",
+          "D. Đoàn thể ở địa phương"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai5", code: "Câu 20",
+        q: "Tự giác chấp hành các quy định về phòng, chống các tội xâm phạm nhân phẩm, danh dự của con người ở nhà trường và địa phương nơi cư trú là?",
+        options: [
+          "A. Vai trò, trách nhiệm của sinh viên",
+          "B. Phương hướng, nhiệm vụ của sinh viên",
+          "C. Thái độ, nghĩa vụ của sinh viên",
+          "D. Mục đích, yêu cầu của sinh viên"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai5", code: "Câu 21",
+        q: 'Điểm khác biệt cốt lõi để phân biệt "Tội vu khống" (Điều 156 Bộ luật Hình sự 2015) với "Tội làm nhục người khác" (Điều 155 Bộ luật Hình sự 2015) là gì?',
+        options: [
+          "A. Sử dụng hung khí nguy hiểm hay không sử dụng hung khí.",
+          "B. Địa điểm thực hiện hành vi phạm tội công khai hay bí mật.",
+          "C. Hành vi bịa đặt, loan truyền những điều biết rõ là sai sự thật hoặc bịa đặt người khác phạm tội.",
+          "D. Độ tuổi của người thực hiện hành vi phạm tội."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai5", code: "Câu 22",
+        q: "Hành vi tham gia bình luận hùa theo, chia sẻ các bài viết bôi nhọ, xúc phạm danh dự một người bạn trong trường khi chưa kiểm chứng thông tin bị nhìn nhận như thế nào dưới góc độ pháp lý?",
+        options: [
+          "A. Là hành vi vô hại vì mình không phải là người trực tiếp viết bài.",
+          "B. Là hành vi tiếp tay cho cái xấu, lan truyền thông tin độc hại và có thể bị xử lý kỷ luật hoặc xử phạt hành chính về hành vi cung cấp, chia sẻ thông tin xúc phạm uy tín của cá nhân.",
+          "C. Được khuyến khích để tăng tương tác và giúp bạn bè trong lớp giải tỏa căng thẳng.",
+          "D. Chỉ là trò đùa nghịch ngợm thông thường của lứa tuổi học sinh, không vi phạm gì."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai5", code: "Câu 23",
+        q: "Nội dung nào sau đây phản ánh đúng biện pháp phòng, chống tội phạm xâm hại danh dự, nhân phẩm của sinh viên trong nhà trường?",
+        options: [
+          "A. Tổ chức các buổi chuyên đề giáo dục kỹ năng sống, phổ biến pháp luật và xây dựng bộ quy tắc ứng xử văn hóa học đường.",
+          "B. Cung cấp số sinh viên có biểu hiện nghi vấn hoạt động phạm tội cho lực lượng công an xử lý",
+          "C. Đấu tranh xóa bỏ các tụ điểm hoạt động tệ nạn xã hội ở khu vực xung quanh trường.",
+          "D. Tổ chức các bộ phận giám sát mọi phát ngôn và hành vi của sinh viên."
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai5", code: "Câu 24",
+        q: "Nguyên nhân chủ quan nào dưới đây dẫn đến việc gia tăng tội phạm làm nhục, vu khống người khác trên mạng xã hội hiện nay?",
+        options: [
+          "A. Hệ thống đường truyền internet quốc gia thường xuyên bị gián đoạn.",
+          "B. Ý thức pháp luật kém, sự lệch lạc về đạo đức, lối sống ích kỷ và bốc đồng của người phạm tội.",
+          "C. Do nạn nhân không chủ động cài đặt mật khẩu bảo vệ tài khoản cá nhân.",
+          "D. Do các trường học không tổ chức các câu lạc bộ tin học cho sinh viên."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai5", code: "Câu 25",
+        q: "Đâu là một trong những nguyên nhân khách quan tác động đến tình trạng tội phạm xâm hại danh dự, nhân phẩm?",
+        options: [
+          "A. Mặt trái của mạng xã hội, sự xâm nhập của lối sống thực dụng và các sản phẩm văn hóa độc hại.",
+          "B. Sự thiếu kiềm chế khả năng tự chủ và tâm lý ghen tuông của bản thân đối tượng.",
+          "C. Việc Nhà nước tăng mức xử phạt tiền đối với các hành vi vi phạm hành chính.",
+          "D. Do thời tiết thay đổi thất thường tác động đến tâm lý người dân"
+        ],
+        ans: 0
+      },
+
+      // ==================== BÀI 6 (37 CÂU) ====================
+      {
+        lesson: "bai6", code: "Câu 01",
+        q: 'Theo Luật An ninh mạng Việt Nam năm 2025, "Không gian mạng" được định nghĩa là gì?',
+        options: [
+          "A. Là mạng lưới toàn cầu của các máy tính được kết nối bằng dây cáp đồng để truyền hình ảnh trực tiếp.",
+          "B. Là môi trường nhân tạo được tạo ra bởi hệ thống các mạng thông tin, hệ thống máy tính, hệ thống viễn thông, mạng Internet để con người thực hiện các hành vi xã hội.",
+          "C. Là một khoảng không gian ảo nằm ngoài bầu khí quyển trái đất phục vụ riêng cho các vệ tinh viễn thông.",
+          "D. Là toàn bộ các website thương mại điện tử công cộng dùng để mua bán hàng hóa trực tuyến."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai6", code: "Câu 02",
+        q: "Hành vi thu thập, sử dụng thông tin cá nhân của người khác trên mạng mà không được sự đồng ý của chủ thể thông tin (chưa đến mức truy cứu trách nhiệm hình sự) sẽ bị xử phạt như thế nào?",
+        options: [
+          "A. Phạt tiền từ 10.000.000 đồng đến 20.000.000 đồng đối với tổ chức vi phạm.",
+          "B. Chỉ bị nhắc nhở, cảnh cáo trên hệ thống mạng và buộc phải xin lỗi công khai.",
+          "C. Bị tước quyền sử dụng mạng Internet cá nhân vĩnh viễn và tịch thu thiết bị.",
+          "D. Không bị phạt tiền nếu chứng minh được mục đích thu thập là vì sở thích cá nhân."
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai6", code: "Câu 03",
+        q: "Bảo vệ an ninh mạng là?",
+        options: [
+          "A. Phòng ngừa, điều tra, ngăn chặn, xử lý hành vi xâm phạm an ninh mạng",
+          "B. Phòng ngừa, phát hiện, ngăn chặn, xử lý hành vi xâm phạm an ninh mạng",
+          "C. Phòng ngừa, phát hiện, điều tra, xử lý hành vi xâm phạm an ninh mạng",
+          "D. Điều tra, phát hiện, ngăn chặn, xử lý hành vi xâm phạm an ninh mạng"
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai6", code: "Câu 04",
+        q: "Tội phạm công nghệ cao gây tổn hại đến?",
+        options: [
+          "A. Lợi ích của nhà nước, quyền và lợi ích hợp pháp của tổ chức, cá nhân",
+          "B. An ninh quốc gia",
+          "C. Tính mạng và tài sản của tổ chức, cá nhân",
+          "D. Lợi ích của các tổ chức chính trị, xã hội"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai6", code: "Câu 05",
+        q: "Trong cuộc cách mạng công nghiệp 4.0 thì thông tin được xem là?",
+        options: [
+          "A. Một dạng tài nguyên",
+          "B. Một dạng tài sản của từng cá nhân",
+          "C. Một dạng tài sản nhà nước quản lý",
+          "D. Không gian lưu trữ số liệu"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai6", code: "Câu 06",
+        q: 'Một bạn sinh viên nhận được cuộc gọi tự xưng là từ "Phòng Hỗ trợ CNTT nội bộ", yêu cầu cung cấp ngay mã OTP vừa gửi về điện thoại với lý do phải xác thực gấp tài khoản để tránh bị khóa hệ thống trong đợt bảo trì khẩn cấp. Người gọi nói giọng rất gấp gáp và nắm rõ tên tuổi, chức vụ của nhân viên này. Sinh viên nên xử lý như thế nào?',
+        options: [
+          "A. Cung cấp ngay mã OTP vì người gọi đã đọc chính xác tên, chức vụ và phòng ban của mình, chứng tỏ đây đúng là đồng nghiệp trong công ty.",
+          "B. Yêu cầu người gọi gửi email nội bộ xác nhận rồi mới cung cấp mã OTP qua điện thoại.",
+          "C. Từ chối cung cấp mã OTP, ngắt máy và chủ động liên hệ lại với bộ phận CNTT qua kênh liên lạc nội bộ chính thống đã được quy định.",
+          "D. Làm theo hướng dẫn nhưng đổi một ký tự trong mã OTP để thử phản ứng của người gọi."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai6", code: "Câu 07",
+        q: "Dưới góc độ pháp lý một trong những yếu tố góp phần làm giảm các vụ tin tặc tấn công mạng trong thời gian qua là do?",
+        options: [
+          "A. Các quy định, chế tài pháp luật đã đầy đủ và có tính răn đe cao",
+          "B. Người sử dụng mạng và các tổ chức đã nâng cao nhận thức, ý thức tự giác bảo mật và chủ động trang bị công nghệ phòng thủ mạnh.",
+          "C. Hệ thống mạng Internet toàn cầu đã tự động vá toàn bộ các lỗ hổng bảo mật mà không cần con người can thiệp.",
+          "D. Chế tài pháp luật có tính răn đe cao"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai6", code: "Câu 08",
+        q: "Khi phát hiện một đường dây tổ chức đánh bạc trực tuyến, hoặc một trang web có hành vi lừa đảo chiếm đoạt tài sản quy mô lớn trên không gian mạng, sinh viên cần báo cáo đến cơ quan nào để xử lý?",
+        options: [
+          "A. Đăng bài bóc phốt lên các hội nhóm mạng xã hội để tự xử lý.",
+          "B. Cục An ninh mạng và phòng, chống tội phạm sử dụng công nghệ cao (Bộ Công an) hoặc cơ quan Công an nơi gần nhất.",
+          "C. Các trung tâm sửa chữa máy tính tư nhân ở địa phương.",
+          "D. Các diễn đàn công nghệ của các doanh nghiệp tư nhân."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai6", code: "Câu 09",
+        q: "Hiện nay các đối tượng tạo tin giả bằng cách sử dụng công nghệ để?",
+        options: [
+          "A. Giả tiếng, giả hình, giả video",
+          "B. Giả lý lịch",
+          "C. Chiếm đoạt tài sản",
+          "D. Tạo dựng uy tín"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai6", code: "Câu 10",
+        q: "Khái niệm khủng bố mạng được hiểu như thế nào là đúng nhất?",
+        options: [
+          "A. Là hành vi sử dụng mạng xã hội để đăng tải các bình luận thô tục, chửi bới, bôi nhọ danh dự và đe dọa bạo lực đối với một cá nhân do mâu thuẫn cá nhân.",
+          "B. Là việc sử dụng không gian mạng, công nghệ thông tin hoặc phương tiện điện tử để thực hiện hành vi khủng bố, phá hoại an ninh quốc gia, trật tự an toàn xã hội.",
+          "C. Là hành vi của các tin tặc tiến hành cài đặt phần mềm độc hại để mã hóa dữ liệu của doanh nghiệp nhằm mục đích tống tiền, trục lợi kinh tế.",
+          "D. Là việc các trang tin điện tử đưa tin sai sự thật về tình hình dịch bệnh gây hoang mang dư luận trong một thời gian ngắn."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai6", code: "Câu 11",
+        q: 'Theo Luật An ninh mạng, "Không gian mạng quốc gia" được xác định là gì?',
+        options: [
+          "A. Là toàn bộ mạng lưới Internet toàn cầu do các tập đoàn công nghệ lớn vận hành.",
+          "B. Là không gian mạng do Chính phủ xác lập, quản lý và kiểm soát.",
+          "C. Là hệ thống mạng máy tính nội bộ của các cơ quan Trung ương do Bộ Công an trực tiếp quản lý.",
+          "D. Là mạng diện rộng cho phép người dân trong nước truy cập."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai6", code: "Câu 12",
+        q: "Theo Điểm g Khoản 2 Điều 7 Luật An ninh mạng năm 2025, hành vi nào sau đây liên quan đến Trí tuệ nhân tạo (AI) bị nghiêm cấm tuyệt đối trên không gian mạng?",
+        options: [
+          "A. Sử dụng trí tuệ nhân tạo để dịch thuật văn bản tự động hoặc hỗ trợ viết mã lập trình.",
+          "B. Sử dụng trí tuệ nhân tạo hoặc công nghệ mới để giả mạo video, hình ảnh, giọng nói của người khác trái quy định của pháp luật (Deepfake).",
+          "C. Ứng dụng trí tuệ nhân tạo vào việc phân tích dữ liệu thị trường và dự báo thời tiết.",
+          "D. Tự động hóa quy trình chăm sóc khách hàng trực tuyến bằng các chatbot sử dụng công nghệ AI."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai6", code: "Câu 13",
+        q: "Theo Luật An ninh mạng, nội dung nào sau đây xác định đúng các loại thông tin có nội dung làm nhục, vu khống trên không gian mạng?",
+        options: [
+          "A. Mọi bài viết, bình luận thể hiện sự bất đồng quan điểm cá nhân hoặc tranh luận gay gắt về một chủ đề xã hội.",
+          "B. Thông tin xúc phạm nghiêm trọng danh dự, nhân phẩm hoặc thông tin bịa đặt, sai sự thật gây thiệt hại đến lợi ích hợp pháp của người khác.",
+          "C. Các bài viết chia sẻ câu chuyện đùa vui, châm biếm đời tư nhưng đã được sự đồng ý trước của người trong cuộc.",
+          "D. Những thông tin phản ánh đúng sự thật về hành vi tiêu cực của cá nhân được đăng tải công khai trên các hội nhóm."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai6", code: "Câu 14",
+        q: "Chủ động phòng ngừa, phát hiện, ngăn chặn, đấu tranh, làm thất bại mọi hoạt động sử dụng không gian mạng xâm phạm an ninh quốc gia, trật tự, an toàn xã hội, quyền và lợi ích hợp pháp của cơ quan, tổ chức, cá nhân; sẵn sàng ngăn chặn các nguy cơ đe dọa an ninh mạng là nội dung thuộc?",
+        options: [
+          "A. Nguyên tắc bảo vệ an ninh mạng",
+          "B. Đặc điểm bảo vệ an ninh mạng",
+          "C. Yêu cầu bảo vệ an ninh mạng",
+          "D. Biện pháp bảo vệ an ninh mạng"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai6", code: "Câu 15",
+        q: "Kịp thời cung cấp thông tin liên quan đến bảo vệ an ninh mạng, nguy cơ đe dọa an ninh mạng, hành vi xâm phạm an ninh mạng cho cơ quan có thẩm quyền, lực lượng bảo vệ an ninh mạng là nội dung thuộc?",
+        options: [
+          "A. Trách nhiệm của cơ quan, tổ chức, cá nhân sử dụng không gian mạng",
+          "B. Biện pháp của cơ quan, tổ chức, cá nhân sử dụng không gian mạng",
+          "C. Nguyên tắc của cơ quan, tổ chức, cá nhân sử dụng không gian mạng",
+          "D. Yêu cầu của cơ quan, tổ chức, cá nhân sử dụng không gian mạng"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai6", code: "Câu 16",
+        q: "An toàn thông tin nhằm duy trì các tính chất nào của thông tin trong lưu trữ, xử lý và truyền dẫn trên mạng?",
+        options: [
+          "A. Tính chính xác, tính công khai và tính kịp thời.",
+          "B. Tính bảo mật, tính toàn vẹn và tính khả dụng.",
+          "C. Tính bí mật, tính liên tục và tính đa dạng.",
+          "D. Tính độc quyền, tính nguyên bản và tính pháp lý."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai6", code: "Câu 17",
+        q: "Điền vào chỗ trống: Bảo đảm an ninh, an toàn thông tin là nhiệm vụ ... trong tình hình hiện nay?",
+        options: [
+          "A. Quan trọng và cấp thiết",
+          "B. Quan trọng và cấp bách",
+          "C. Quan trọng hàng đầu",
+          "D. Có tính chất sống còn với đất nước ta"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai6", code: "Câu 18",
+        q: "Tin giả có thể gây ra tình trạng gì?",
+        options: [
+          "A. Rối loạn xã hội",
+          "B. Tăng trưởng kinh tế",
+          "C. Phòng chống dịch bệnh",
+          "D. Xóa đói giảm nghèo"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai6", code: "Câu 19",
+        q: "Khi phát hiện các thông tin trên không gian mạng có nội dung xuyên tạc lịch sử, xúc phạm uy tín của cơ quan, tổ chức hoặc danh dự của cá nhân, sinh viên cần làm gì để thể hiện trách nhiệm của mình?",
+        options: [
+          "A. Chia sẻ (Share) rộng rãi để bạn bè cùng vào bình luận.",
+          "B. Giữ im lặng, coi như không thấy để tránh phiền phức cho bản thân.",
+          "C. Không chia sẻ, không bình luận cổ xúy; đồng thời thông báo, phản ánh ngay với cơ quan chức năng hoặc báo cáo (Report) vi phạm trên nền tảng mạng xã hội.",
+          "D. Sao chép lại nội dung đó và đăng tải sang một hội nhóm khác để cảnh báo mọi người"
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai6", code: "Câu 20",
+        q: "Đâu là thủ đoạn tinh vi thường được tội phạm mạng sử dụng để đánh cắp thông tin đăng nhập ngân hàng (OTP, mật khẩu) của người dùng?",
+        options: [
+          "A. Gửi email chứa liên kết giả mạo giao diện ngân hàng (Phishing) dụ người dùng đăng nhập để nhận thưởng hoặc xử lý sự cố.",
+          "B. Gọi điện thoại thông báo trúng thưởng công khai trên hệ thống phát thanh truyền hình quốc gia.",
+          "C. Gửi thư bưu điện yêu cầu người dùng xác nhận thông tin tài khoản bằng chữ ký tay.",
+          "D. Tự động nâng cấp hạn mức thẻ tín dụng trực tiếp tại quầy giao dịch của ngân hàng."
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai6", code: "Câu 21",
+        q: "Theo quy định của pháp luật, an toàn thông tin mạng là sự bảo vệ thông tin và hệ thống thông tin trên mạng tránh khỏi điều gì?",
+        options: [
+          "A. Tránh bị truy nhập, sử dụng, tiết lộ, gián đoạn, sửa đổi hoặc phá hoại trái phép.",
+          "B. Tránh bị nhiễu sóng điện từ và hư hỏng phần cứng do thời tiết.",
+          "C. Tránh bị rò rỉ thông tin ra nước ngoài thông qua văn bản giấy.",
+          "D. Tránh bị người dùng quên mật khẩu đăng nhập."
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai6", code: "Câu 22",
+        q: "Khái niệm tội phạm mạng được hiểu như thế nào là đúng nhất dưới góc độ pháp lý?",
+        options: [
+          "A. Là việc sử dụng không gian mạng để thực hiện hành vi bạo loạn, lật đổ chính quyền nhân dân, đe dọa an ninh quốc gia.",
+          "B. Là hành vi sử dụng không gian mạng, công nghệ thông tin hoặc phương tiện điện tử để thực hiện tội phạm được quy định trong Bộ luật Hình sự.",
+          "C. Là mọi hành vi truy cập vào các trang web nước ngoài không được Nhà nước cấp phép hoạt động tại Việt Nam.",
+          "D. Là các lỗi làm rò rỉ dữ liệu cá nhân của nhà quản lý."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai6", code: "Câu 23",
+        q: "Khái niệm tấn công mạng được hiểu như thế nào là đúng nhất?",
+        options: [
+          "A. Là hành vi sử dụng các công cụ truyền thông trực tuyến để liên tục gửi tin nhắn xúc phạm, đe dọa vũ lực đối với một cá nhân trên mạng xã hội.",
+          "B. Là việc sử dụng không gian mạng, thiết bị công nghệ hoặc phương tiện điện tử để xâm nhập, chiếm quyền điều khiển, làm gián đoạn, ngưng trệ, làm sai lệch hoặc phá hoại hệ thống thông tin.",
+          "C. Là hành vi vô ý hoặc cố ý làm hỏng hóc thiết bị phần cứng tại trung tâm dữ liệu dẫn đến gián đoạn kết nối Internet.",
+          "D. Là hành vi đăng tải các bài viết thể hiện sự bất đồng quan điểm trên không gian mạng."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai6", code: "Câu 24",
+        q: "Bản chất của công tác đảm bảo an toàn thông tin là sự tổng hòa của những yếu tố nào?",
+        options: [
+          "A. Chỉ các phần mềm diệt virus độc quyền.",
+          "B. Biện pháp kỹ thuật, quy trình quản lý và nhận thức con người.",
+          "C. Chỉ các quy định xử phạt vi phạm hành chính của nhà nước.",
+          "D. Phần cứng máy tính cấu hình mạnh."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai6", code: "Câu 25",
+        q: "Biện pháp nào giúp hạn chế việc lộ lọt thông tin cá nhân dẫn đến việc bị các đối tượng xấu gọi điện lừa đảo, ép nợ hoặc đe dọa?",
+        options: [
+          "A. Không công khai số căn cước công dân, số điện thoại và địa chỉ nhà lên các bài viết công khai trên Facebook.",
+          "B. Không tự ý cung cấp thông tin cá nhân trên các trang web lạ; hạn chế tham gia các minigame trúng thưởng yêu cầu điền thông tin chi tiết.",
+          "C. Không cho người lạ mượn điện thoại hoặc chụp ảnh hai mặt thẻ ngân hàng gửi qua tin nhắn mạng xã hội.",
+          "D. Không đăng ảnh hộ chiếu, vé máy bay còn nguyên mã vạch (barcode) lên mạng để check-in."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai6", code: "Câu 26",
+        q: "Sinh viên có thể tham gia vào công tác phòng, chống vi phạm pháp luật trên không gian mạng bằng hình thức thiết thực nào?",
+        options: [
+          "A. Tự xây dựng các phần mềm tấn công lại các tài khoản lừa đảo.",
+          "B. Tích cực tham gia các buổi tuyên truyền phổ biến pháp luật (Luật An ninh mạng, Luật Bảo vệ dữ liệu cá nhân), nâng cao kỹ năng số và ứng xử văn minh trên mạng.",
+          "C. Tố giác các hành vi lừa đảo trực tuyến với cơ quan chức năng.",
+          "D. Không tải và sử dụng các công cụ ẩn danh để truy cập vào các trang web đen bị cấm."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai6", code: "Câu 27",
+        q: '"Tính khả dụng" (Availability) trong an toàn thông tin mạng thể hiện điều gì?',
+        options: [
+          "A. Hệ thống và dữ liệu luôn sẵn sàng cho người dùng hợp pháp sử dụng khi có nhu cầu.",
+          "B. Người dùng có thể tự do thay đổi quyền hạn của hệ thống.",
+          "C. Mạng Internet không bao giờ bị cắt.",
+          "D. Phần mềm luôn tự động cập nhật phiên bản mới nhất."
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai6", code: "Câu 28",
+        q: "Công nghệ Deepfake có thể được các đối tượng sử dụng vào mục đích nào sau đây?",
+        options: [
+          "A. Giả mạo hình ảnh và giọng nói của người thân hoặc lãnh đạo cơ quan để lừa đảo chuyển tiền.",
+          "B. Tạo ra các video giải trí để câu view trên mạng xã hội công cộng.",
+          "C. Đột nhập trực tiếp vào hệ thống cơ sở dữ liệu quốc gia bằng sinh trắc học giả.",
+          "D. Tăng tốc độ đường truyền internet khi tiến hành các cuộc tấn công DDoS."
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai6", code: "Câu 29",
+        q: "Văn bản pháp lý nào sau đây là cơ sở pháp lý nền tảng, trực tiếp nhất để xác định các hành vi bị nghiêm cấm và các biện pháp bảo vệ an ninh mạng tại Việt Nam?",
+        options: [
+          "A. Bộ luật Dân sự và các văn bản hướng dẫn thi hành về quyền nhân thân.",
+          "B. Luật An ninh mạng và Luật An toàn thông tin mạng.",
+          "C. Luật Cạnh tranh và các quy định về độc quyền doanh nghiệp viễn thông.",
+          "D. Luật Bưu chính và các quy định về quản lý bưu phẩm quốc tế."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai6", code: "Câu 30",
+        q: "Hành vi nào sau đây bị nghiêm cấm trên không gian mạng theo quy định của pháp luật Việt Nam?",
+        options: [
+          "A. Đăng tải ý kiến đóng góp xây dựng chính sách pháp luật trên trang web chính phủ.",
+          "B. Sử dụng không gian mạng để thông tin sai sự thật gây hoang mang trong nhân dân, thiệt hại cho hoạt động kinh tế - xã hội.",
+          "C. Tham gia các khóa học trực tuyến do các trường đại học uy tín tổ chức.",
+          "D. Chia sẻ hình ảnh phong cảnh quê hương đất nước lên trang cá nhân mạng xã hội."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai6", code: "Câu 31",
+        q: "Việc tạo tài khoản mạng xã hội giả mạo tên, hình ảnh của người khác nhằm mục đích lừa đảo, chiếm đoạt tài sản được cấu thành tội danh gì trong Bộ luật Hình sự?",
+        options: [
+          "A. Tội vô ý làm lộ thông tin bí mật cá nhân.",
+          "B. Tội sử dụng mạng máy tính, mạng viễn thông, phương tiện điện tử để thực hiện hành vi chiếm đoạt tài sản.",
+          "C. Tội vi phạm quy định về bản quyền hình ảnh nhiếp ảnh.",
+          "D. Tội truy cập bất hợp pháp vào phòng máy chủ vật lý."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai6", code: "Câu 32",
+        q: "Hành vi cố ý phát tán chương trình tin học gây hại (mã độc, virus, trojan) vào hệ thống thông tin của cơ quan Nhà nước nhằm phá hoại hoặc đánh cắp tài liệu mật sẽ bị xử lý như thế nào?",
+        options: [
+          "A. Chỉ bị nhắc nhở và khóa tài khoản email tạm thời.",
+          "B. Bị xử phạt vi phạm hành chính.",
+          "C. Bị truy cứu trách nhiệm hình sự theo các tội danh liên quan đến an toàn thông tin, an ninh mạng.",
+          "D. Được miễn trừ trách nhiệm nếu là sinh viên."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai6", code: "Câu 33",
+        q: "Khi phát hiện một bài viết hoặc video có nội dung xúc phạm danh dự, nhân phẩm của bản thân hoặc người khác trên không gian mạng, sinh viên không nên làm điều nào sau đây?",
+        options: [
+          "A. Lưu lại bằng chứng (hình ảnh, video, liên kết) để cung cấp cho cơ quan chức năng khi cần.",
+          "B. Báo cáo bài viết vi phạm (Report) lên nền tảng mạng xã hội đó.",
+          "C. Kêu gọi bạn bè lập hội nhóm để nhắn tin chửi bới, đe dọa hoặc tấn công mạng lại kẻ vi phạm.",
+          "D. Gửi đơn phản ánh, tố giác đến cơ quan Công an hoặc Cục An toàn thông tin."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai6", code: "Câu 34",
+        q: "Hành vi nào sau đây vi phạm Luật Sở hữu trí tuệ trên không gian mạng?",
+        options: [
+          "A. Trích dẫn một đoạn văn ngắn trong bài báo mạng và có ghi rõ nguồn, tên tác giả.",
+          "B. Tự ý tải phim chiếu rạp, bài hát có bản quyền rồi đăng tải lại (re-up) lên YouTube để bật kiếm tiền khi chưa được phép.",
+          "C. Mua tài khoản xem phim trực tuyến chính thức từ nhà phát hành.",
+          "D. Tự sáng tác nhạc và đăng tải lên trang cá nhân của mình."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai6", code: "Câu 35",
+        q: "Việc tham gia các trò chơi đổi thưởng (game bài, cá độ bóng đá) ăn tiền trực tiếp qua các ứng dụng hoặc trang web trên mạng Internet bị pháp luật Việt Nam nhìn nhận như thế nào?",
+        options: [
+          "A. Là hành vi giải trí hợp pháp nếu số tiền cá cược dưới 1 triệu đồng.",
+          "B. Là hành vi vi phạm pháp luật (có thể bị xử phạt hành chính hoặc xử lý hình sự về tội Đánh bạc / Tổ chức đánh bạc).",
+          "C. Là mô hình kinh doanh công nghệ được nhà nước khuyến khích phát triển.",
+          "D. Chỉ là trò chơi ảo, không tính là hành vi vi phạm pháp luật ngoài đời thực."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai6", code: "Câu 36",
+        q: "Nội dung nào sau đây phản ánh đúng biện pháp nghiệp vụ, kỹ thuật trong công tác đấu tranh phòng, chống vi phạm pháp luật trên không gian mạng?",
+        options: [
+          "A. Tuyên truyền, phổ biến các quy định của Luật An ninh mạng rộng rãi đến toàn thể nhân dân.",
+          "B. Phạt tiền từ 10 triệu đến 20 triệu đồng đối với các tổ chức có hành vi tung tin giả lên mạng xã hội.",
+          "C. Khởi tố vụ án hình sự, điều tra và xét xử nghiêm minh các đối tượng lừa đảo chiếm đoạt tài sản qua mạng.",
+          "D. Tiến hành giám sát, kiểm tra an ninh mạng và áp dụng các công nghệ chặn lọc, gỡ bỏ thông tin độc hại."
+        ],
+        ans: 3
+      },
+      {
+        lesson: "bai6", code: "Câu 37",
+        q: 'Một tài khoản lạ trên mạng xã hội chủ động kết bạn với sinh viên, tự xưng là đại diện của một quỹ học bổng quốc tế và đề nghị sinh viên cung cấp bản quét (scan) thẻ sinh viên, danh sách đề tài nghiên cứu của khoa, kèm theo sơ đồ tổ chức nội bộ của trường để "xét duyệt tài trợ". Sinh viên cần xử lý tình huống này thế nào?',
+        options: [
+          "A. Cung cấp ngay vì đây là cơ hội hiếm có để nhận học bổng quốc tế và giúp quảng bá hình ảnh của nhà trường ra thế giới.",
+          "B. Chỉ cung cấp sơ đồ tổ chức nội bộ và thẻ sinh viên cá nhân, còn danh sách tài liệu nghiên cứu thì từ chối vì lý do bản quyền.",
+          "C. Cảnh giác trước thủ đoạn thu thập thông tin, gián điệp mạng núp bóng tài trợ; từ chối cung cấp dữ liệu nội bộ và báo cáo sự việc với phòng công tác sinh viên hoặc cơ quan chức năng để xác minh.",
+          "D. Chuyển tiếp lời mời này cho tất cả các bạn trong lớp cùng gửi thông tin cá nhân để tăng tỷ lệ nhận được học bổng cho tập thể."
+        ],
+        ans: 2
+      },
+
+      // ==================== BÀI 7 (24 CÂU) ====================
+      {
+        lesson: "bai7", code: "Câu 01",
+        q: "Khái niệm an ninh truyền thống được hiểu như thế nào là đúng nhất dưới góc độ an ninh quốc gia?",
+        options: [
+          "A. Là trạng thái quốc gia được bảo đảm an toàn trước các thách thức phi quân sự như dịch bệnh, biến đổi khí hậu và ô nhiễm môi trường.",
+          "B. Là an toàn, ổn định của đất nước trước các mối đe dọa hoặc tấn công quân sự từ bên ngoài và bên trong.",
+          "C. Là việc duy trì và bảo vệ các giá trị văn hóa, phong tục tập quán, đạo đức cổ truyền của dân tộc trước sự hội nhập quốc tế.",
+          "D. Là sự ổn định và phát triển bền vững của hệ thống các tổ chức tín dụng, thị trường tài chính và tiền tệ quốc gia."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai7", code: "Câu 02",
+        q: "Theo Luật An ninh quốc gia, khái niệm an ninh quốc gia được hiểu như thế nào là chính xác và đầy đủ nhất?",
+        options: [
+          "A. Là việc xây dựng lực lượng quân đội và công an vững mạnh để sẵn sàng chiến đấu, đánh thắng mọi kẻ thù xâm lược từ bên ngoài.",
+          "B. Là trạng thái toàn bộ người dân trong xã hội đều tự giác chấp hành nghiêm chỉnh luật giao thông và không vi phạm pháp luật hành chính.",
+          "C. Là công tác quản lý biên giới, hải đảo nhằm ngăn chặn dòng người di cư trái phép và kiểm soát hoạt động xuất nhập khẩu hàng hóa.",
+          "D. Là trạng thái ổn định, phát triển bền vững của chế độ và Nhà nước, sự bất khả xâm phạm độc lập, chủ quyền, thống nhất, toàn vẹn lãnh thổ của Tổ quốc."
+        ],
+        ans: 3
+      },
+      {
+        lesson: "bai7", code: "Câu 03",
+        q: "An ninh phi truyền thống xuất phát từ các yếu tố do tự nhiên gây ra như?",
+        options: [
+          "A. Biến đổi khí hậu, thiên tai, bão lũ, hạn hán, sóng thần",
+          "B. Biến đổi khí hậu, xung đột biên giới, hỏa hoạn",
+          "C. Hạn hán, ô nhiễm môi trường, khủng hoảng kinh tế",
+          "D. Khủng hoảng kinh tế, hạn hán, tội phạm, ma túy"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai7", code: "Câu 04",
+        q: "Mối đe dọa về an ninh phi truyền thống đối với một quốc gia chủ yếu xuất phát và do các yếu tố nào sau đây gây ra?",
+        options: [
+          "A. Các yếu tố quân sự, chạy đua vũ trang và nguy cơ chiến tranh xâm lược từ các quốc gia đối địch.",
+          "B. Các yếu tố phi quân sự, bộc phát từ tự nhiên hoặc các tác động tiêu cực của quá trình toàn cầu hóa, hội nhập quốc tế.",
+          "C. Sự bất đồng về tư tưởng chính trị và đường lối ngoại giao giữa các đảng phái cầm quyền trên thế giới.",
+          "D. Hoạt động tuần tra, kiểm soát và bảo vệ biên giới đất liền của lực lượng biên phòng quốc gia."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai7", code: "Câu 05",
+        q: "Những thách thức, nguy cơ đối với an ninh truyền thống là?",
+        options: [
+          "A. Nguy cơ xâm phạm chủ quyền lãnh thổ, biên giới quốc gia",
+          "B. Nguy cơ mất lòng tin của nhân dân đối với cách mạng",
+          "C. Nguy cơ mất an ninh trật tự, mất ổn định trong xã hội",
+          "D. Nguy cơ mất đoàn kết toàn dân tộc, đoàn kết quốc tế"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai7", code: "Câu 06",
+        q: "Thách thức và đe dọa từ an ninh phi truyền thống trên lĩnh vực kinh tế là?",
+        options: [
+          "A. An ninh năng lượng",
+          "B. An ninh xã hội",
+          "C. An ninh dân tộc",
+          "D. An ninh tôn giáo"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai7", code: "Câu 07",
+        q: "Các thế lực thù địch lợi dụng các yếu tố từ an ninh phi truyền thống để?",
+        options: [
+          "A. Kích động gây rối, làm mất ổn định chính trị",
+          "B. Kết hợp tiến công quân sự với kinh tế",
+          "C. Thực hiện kế hoạch can thiệp quân sự",
+          "D. Bạo loạn lật đổ và can thiệp vũ trang"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai7", code: "Câu 08",
+        q: "Nâng cao nhận thức về các mối đe dọa của an ninh phi truyền thống đối với an ninh con người, an ninh cộng đồng, an ninh quốc gia và an ninh nhân loại là nghĩa vụ và trách nhiệm của ai?",
+        options: [
+          "A. Riêng của lực lượng Công an nhân dân và Quân đội nhân dân trong thế trận phòng thủ.",
+          "B. Các cơ quan quản lý nhà nước về môi trường, y tế và công nghệ thông tin.",
+          "C. Toàn Đảng, toàn dân, toàn quân, của cả hệ thống chính trị và của mỗi công dân.",
+          "D. Các tổ chức quốc tế và các quốc gia phát triển chịu trách nhiệm toàn cầu."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai7", code: "Câu 09",
+        q: "Nội dung nào sau đây nêu đúng các mối đe dọa an ninh phi truyền thống có khả năng chuyển hóa trực tiếp thành an ninh truyền thống?",
+        options: [
+          "A. Biến đổi khí hậu, cạn kiệt tài nguyên thiên nhiên, ô nhiễm môi trường biển và thiên tai lũ lụt.",
+          "B. Xung đột dân tộc, tôn giáo, hoạt động khủng bố và bạo loạn chính trị vũ trang.",
+          "C. Sự cố rò rỉ dữ liệu máy chủ, nghẽn mạng diện rộng và tin tặc lừa đảo chiếm đoạt tài sản.",
+          "D. Khủng hoảng tài chính toàn cầu, lạm phát tiền tệ và đứt gãy chuỗi cung ứng lương thực."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai7", code: "Câu 10",
+        q: "Để quản trị và kiểm soát các mối đe dọa an ninh phi truyền thống có hiệu quả, chúng ta phải?",
+        options: [
+          "A. Phát huy sức mạnh tổng hợp của hệ thống chính trị và toàn xã hội",
+          "B. Phát huy sức mạnh đoàn kết quốc tế với lực lượng hòa bình thế giới",
+          "C. Nâng cao sức mạnh chiến đấu của lực lượng vũ trang nhân dân",
+          "D. Đẩy mạnh sự nghiệp đổi mới, công nghiệp hóa, hiện đại hóa"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai7", code: "Câu 11",
+        q: "Nội dung cơ bản của an ninh quốc gia là bảo vệ?",
+        options: [
+          "A. Lợi ích của quốc gia",
+          "B. Lợi ích của nhân dân",
+          "C. Lợi ích của giai cấp",
+          "D. Lợi ích của nhà nước"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai7", code: "Câu 12",
+        q: "Bản chất nhân văn trong quan điểm của Đảng và Nhà nước ta về ứng phó an ninh phi truyền thống là đặt yếu tố nào lên vị trí trung tâm, tối cao?",
+        options: [
+          "A. Tăng trưởng chỉ số kinh tế quốc gia.",
+          "B. Bảo vệ tính mạng, sức khỏe, tài sản và lợi ích hợp pháp của Nhân dân (An ninh con người).",
+          "C. Mua sắm trang thiết bị vũ khí hiện đại cho lực lượng vũ trang nhân dân.",
+          "D. Đầu tư phát triển khoa học công nghệ tạo ra phần mềm phòng thủ không gian mạng."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai7", code: "Câu 13",
+        q: "Hành vi nào sau đây được coi là mối đe dọa nguy hiểm nhất đối với an ninh kinh tế từ bên trong (nội bộ) hệ thống chính trị - xã hội Việt Nam hiện nay?",
+        options: [
+          "A. Việc các doanh nghiệp vừa và nhỏ trong nước liên tục bị thua lỗ và phá sản do năng lực quản trị yếu kém.",
+          "B. Hiện tượng \"lợi ích nhóm\" móc nối thao túng chính sách, bẻ lái quy hoạch để trục lợi, làm sai lệch phân bổ nguồn lực quốc gia và suy yếu thể chế.",
+          "C. Sự sụt giảm chỉ số chứng khoán trong ngắn hạn do tác động tiêu cực từ cuộc khủng hoảng tài chính toàn cầu.",
+          "D. Việc người dân tăng cường tích trữ vàng miếng và ngoại tệ thay vì gửi tiền tiết kiệm vào hệ thống ngân hàng thương mại."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai7", code: "Câu 14",
+        q: "Các thế lực thù địch lợi dụng xu thế toàn cầu hóa để đưa ra những yêu cầu, khuyến nghị trong các quan hệ nhằm hạn chế hiệu quả lãnh đạo của Đảng, hiệu lực quản lý của Nhà nước là những thách thức đe dọa từ an ninh phi truyền thống đối với lĩnh vực?",
+        options: [
+          "A. Chính trị tinh thần",
+          "B. Văn hóa tinh thần",
+          "C. Kinh tế xã hội",
+          "D. Chính trị xã hội"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai7", code: "Câu 15",
+        q: "Thách thức và đe dọa từ an ninh phi truyền thống, chúng ta phải chịu tác động không nhỏ từ các luồng văn hóa, đạo đức, lối sống thực dụng, độc hại, không lành mạnh, làm lệch chuẩn?",
+        options: [
+          "A. Tư tưởng, phẩm chất, đạo đức lối sống của giới trẻ",
+          "B. Đường lối chủ trương chính sách của Đảng, Nhà nước",
+          "C. Chủ nghĩa Mác - Lênin, tư tưởng Hồ Chí Minh",
+          "D. Đường lối đối ngoại đa dạng hóa, đa phương hóa"
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai7", code: "Câu 16",
+        q: "Trong bối cảnh hội nhập quốc tế sâu rộng, biểu hiện nào dưới đây là cốt lõi nhất để bảo đảm an ninh kinh tế?",
+        options: [
+          "A. Giữ vững ổn định kinh tế vĩ mô, làm chủ nền kinh tế, không bị chi phối hoặc lệ thuộc vào bên ngoài trong các quyết sách chiến lược.",
+          "B. Mở rộng quan hệ hợp tác với các nước để thu hút vốn đầu tư.",
+          "C. Tham gia các diễn đàn kinh tế quốc tế để nâng cao vị thế quốc gia.",
+          "D. Ký kết hiệp định thương mại với các nước để mở rộng thị trường."
+        ],
+        ans: 0
+      },
+      {
+        lesson: "bai7", code: "Câu 17",
+        q: "Đặc trưng cốt lõi nhất để phân biệt một mối đe dọa an ninh phi truyền thống với một mối đe dọa an ninh truyền thống là gì?",
+        options: [
+          "A. An ninh phi truyền thống chỉ do các tác nhân phi quốc gia gây ra, còn an ninh truyền thống luôn do quân đội của một quốc gia có chủ quyền tiến hành.",
+          "B. An ninh phi truyền thống hủy hoại an ninh con người và sự ổn định xã hội một cách phi vũ trang, trong khi an ninh truyền thống chỉ tập trung vào việc xâm phạm chủ quyền lãnh thổ cứng.",
+          "C. Mối đe dọa an ninh phi truyền thống thường có tính chất xuyên quốc gia, lan tỏa phi quân sự, phá hoại an ninh từ gốc rễ sinh tồn của xã hội và khó định vị cụ thể một đối thủ đối kháng trực diện.",
+          "D. An ninh phi truyền thống phát sinh từ mặt trái của quá trình phát triển công nghiệp, còn an ninh truyền thống chỉ xuất hiện khi có mâu thuẫn sâu sắc về hệ tư tưởng chính trị giữa các quốc gia."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai7", code: "Câu 18",
+        q: "Trong mối quan hệ biện chứng giữa an ninh truyền thống và an ninh phi truyền thống, nhận định nào sau đây phản ánh chính xác nhất thực tiễn cục diện an ninh hiện nay?",
+        options: [
+          "A. An ninh phi truyền thống đã hoàn toàn thay thế an ninh truyền thống, trở thành nguy cơ duy nhất đe dọa đến sự tồn vong của các quốc gia trong kỷ nguyên số.",
+          "B. Mối đe dọa an ninh phi truyền thống có thể đóng vai trò là ngòi nổ, tác nhân làm trầm trọng hơn hoặc trực tiếp chuyển hóa thành các xung đột an ninh truyền thống / xung đột vũ trang truyền thống.",
+          "C. Hai loại hình an ninh này tồn tại độc lập song song; các giải pháp quân sự của an ninh truyền thống không có giá trị hỗ trợ đối phó với an ninh phi truyền thống.",
+          "D. Chỉ khi một quốc gia giải quyết triệt để các nguy cơ an ninh truyền thống thì các mối đe dọa an ninh phi truyền thống mới xuất hiện như một hệ quả tất yếu của quá trình phát triển."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai7", code: "Câu 19",
+        q: "Sự việc một nhóm tin tặc (hacker) quốc tế tấn công mã hóa toàn bộ dữ liệu của hệ thống tổng công ty điện lực quốc gia, đòi tiền chuộc và làm tê liệt mạng lưới điện trong nhiều ngày được phân loại chính xác nhất vào dạng mối đe dọa nào?",
+        options: [
+          "A. Là một hành vi gián điệp mạng thuộc phạm vi thách thức an ninh truyền thống thuần túy.",
+          "B. Là mối đe dọa an ninh phi truyền thống, nhưng mang hiểm họa gián tiếp đe dọa nghiêm trọng đến an ninh truyền thống quốc gia.",
+          "C. Là một dạng tội phạm hình sự công nghệ cao thông thường, không đủ yếu tố cấu thành một mối đe dọa an ninh quốc gia.",
+          "D. Là cuộc tấn công quân sự phi đối xứng sử dụng vũ khí số, thuộc hình thái chiến tranh thông tin bắt buộc phải đáp trả bằng quân sự."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai7", code: "Câu 20",
+        q: "Theo quan điểm chiến lược của Đảng và Nhà nước ta hiện nay, phương châm cốt lõi nhất để ứng phó với các thách thức an ninh phi truyền thống là gì?",
+        options: [
+          "A. Coi trọng ứng phó, xử lý hậu quả tại chỗ; tăng cường đầu tư mua sắm trang thiết bị kỹ thuật hiện đại để chế ngự thiên tai, dịch bệnh.",
+          "B. Đặt trọng tâm vào việc thiết lập các liên minh quân sự xuyên quốc gia để tận dụng tiềm lực công nghệ của các nước phát triển.",
+          "C. Ưu tiên nguồn lực cho công tác bảo vệ môi trường sinh thái, xem đây là chìa khóa duy nhất để triệt tiêu mọi nguy cơ an ninh phi truyền thống khác.",
+          "D. Chủ động phòng ngừa, phát hiện sớm, ứng phó kịp thời; kết hợp chặt chẽ giữa phát triển kinh tế - xã hội với bảo đảm quốc phòng, an ninh và hợp tác quốc tế."
+        ],
+        ans: 3
+      },
+      {
+        lesson: "bai7", code: "Câu 21",
+        q: "Mặt trái đáng ngại nhất của xu thế toàn cầu hóa và cách mạng công nghệ số đối với an ninh kinh tế của một nước đang phát triển như nước ta hiện nay (dưới góc nhìn an ninh phi truyền thống) là gì?",
+        options: [
+          "A. Làm cho các doanh nghiệp nội địa hoàn toàn phá sản do không thể cạnh tranh sòng phẳng với các tập đoàn đa quốc gia.",
+          "B. Làm gia tăng tỷ lệ lạm phát phi mã do dòng vốn đầu tư gián tiếp nước ngoài (FII) liên tục rút khỏi thị trường.",
+          "C. Khiến nền kinh tế dễ bị tổn thương, dễ bị thao túng hạ tầng dữ liệu tài chính từ xa, và đối mặt với các cuộc khủng hoảng xuyên biên giới lan truyền theo hiệu ứng domino cực nhanh.",
+          "D. Làm mất đi hoàn toàn quyền tự chủ về thuế quan và các chính sách an sinh xã hội cốt lõi của chính phủ."
+        ],
+        ans: 2
+      },
+      {
+        lesson: "bai7", code: "Câu 22",
+        q: 'Dưới góc nhìn an ninh quốc gia, một hiện tượng xã hội (ví dụ: phân hóa giàu nghèo, xung đột sắc tộc nhỏ lẻ) chuyển hóa từ một "vấn đề xã hội thông thường" thành một "mối đe dọa an ninh xã hội" khi nó đạt đến ngưỡng nào sau đây?',
+        options: [
+          "A. Khi tỷ lệ thất nghiệp của nhóm người nghèo vượt quá ngưỡng 15% tổng lực lượng lao động của quốc gia.",
+          "B. Khi hiện tượng đó tích tụ mâu thuẫn đủ lớn, bị các thế lực thù địch lợi dụng để kích động, bạo loạn, làm tê liệt sự quản lý của chính quyền và phá vỡ khối đại đoàn kết dân tộc.",
+          "C. Khi hệ thống tòa án và cơ quan thi hành án hình sự bị quá tải do số lượng các vụ tranh chấp dân sự tăng đột biến.",
+          "D. Khi chính phủ buộc phải ban hành các gói cứu trợ tài chính khẩn cấp nhằm ổn định đời sống của các cộng đồng yếu thế."
+        ],
+        ans: 1
+      },
+      {
+        lesson: "bai7", code: "Câu 23",
+        q: 'Trong kỷ nguyên số, một chiến dịch "thao túng thông tin xuyên biên giới" nguy hiểm hơn các cuộc tấn công mạng phá hoại hạ tầng kỹ thuật thuần túy ở điểm cốt lõi nào?',
+        options: [
+          "A. Nó sử dụng các thuật toán mã hóa dữ liệu cấp cao mà không một hệ thống tường lửa nào có thể phát hiện được.",
+          "B. Nó làm suy giảm tốc độ đường truyền internet toàn cầu và gây thất thoát trực tiếp tài sản tài chính của hệ thống ngân hàng quốc tế.",
+          "C. Nó không chỉ đánh cắp dữ liệu mà còn trực tiếp phá hủy phần cứng của các máy chủ lưu trữ thông tin chiến lược.",
+          "D. Nó tấn công trực tiếp vào nhận thức, niềm tin của người dân, làm xói mòn tính chính danh của thể chế chính trị và gây chia rẽ xã hội sâu sắc từ bên trong mà không cần sử dụng vũ lực."
+        ],
+        ans: 3
+      },
+      {
+        lesson: "bai7", code: "Câu 24",
+        q: 'Dưới góc độ quốc phòng - an ninh, tại sao "Biến đổi khí hậu" lại được các nhà chiến lược gọi là "Chất xúc tác làm trầm trọng hơn các xung đột"?',
+        options: [
+          "A. Vì hiện tượng nóng lên toàn cầu trực tiếp làm thay đổi tính năng chiến đấu của các loại vũ khí công nghệ cao.",
+          "B. Vì thiên tai làm gia tăng tần suất xuất hiện của các hiện tượng thời tiết cực đoan, buộc quân đội các nước phải chuyển sang trạng thái chiến tranh tổng lực.",
+          "C. Vì nó làm cạn kiệt tài nguyên sinh tồn (nước ngọt, đất canh tác), gây dịch chuyển dân cư quy mô lớn (tị nạn khí hậu), từ đó châm ngòi cho các tranh chấp sắc tộc, biên giới và bất ổn chính trị nội bộ.",
+          "D. Vì biến đổi khí hậu là nguyên nhân trực tiếp dẫn đến sự xuất hiện của các tư tưởng chính trị cực đoan mới."
+        ],
+        ans: 2
+      }
+    ];
+
+    // Gán ID duy nhất cho từng câu
+    QUESTION_BANK.forEach((item, idx) => {
+      item.id = "q_" + idx;
+    });
+
+    /**************************************************************
+     * 3. XỬ LÝ MẬT KHẨU ĐĂNG NHẬP (21012008ngo)
+     **************************************************************/
+    const REQUIRED_PASS = "21012008ngo";
+    const loginOverlay = document.getElementById("login-overlay");
+    const loginCard = document.getElementById("login-card");
+    const loginForm = document.getElementById("login-form");
+    const pwInput = document.getElementById("pw-input");
+    const loginError = document.getElementById("login-error");
+    const togglePwBtn = document.getElementById("toggle-pw");
+
+    togglePwBtn.addEventListener("click", () => {
+      const isPw = pwInput.type === "password";
+      pwInput.type = isPw ? "text" : "password";
+      togglePwBtn.textContent = isPw ? "🙈" : "👁️";
+    });
+
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (pwInput.value.trim() === REQUIRED_PASS) {
+        playSound(true);
+        loginOverlay.classList.add("hidden");
+      } else {
+        playSound(false);
+        loginError.textContent = "Mật khẩu chưa chính xác! Vui lòng thử lại.";
+        loginCard.classList.remove("shake");
+        void loginCard.offsetWidth;
+        loginCard.classList.add("shake");
+      }
+    });
+
+    /**************************************************************
+     * 4. QUẢN LÝ TRẠNG THÁI & HIỂN THỊ CÂU HỎI
+     **************************************************************/
+    let currentLesson = "bai1";
+    let showAllRed = false;
+    let userSelections = {}; // { questionId: selectedOptionIndex }
+    let displayedQuestions = [];
+
+    const lessonListEl = document.getElementById("lesson-list");
+    const questionsContainer = document.getElementById("questions-container");
+    const paletteGrid = document.getElementById("palette-grid");
+    const searchInput = document.getElementById("search-input");
+
+    function getQuestionsByLesson(lessonId) {
+      if (lessonId === "all") return [...QUESTION_BANK];
+      return QUESTION_BANK.filter(q => q.lesson === lessonId);
+    }
+
+    function renderSidebar() {
+      lessonListEl.innerHTML = "";
+      LESSONS_META.forEach(m => {
+        const count = m.id === "all"
+          ? QUESTION_BANK.length
+          : QUESTION_BANK.filter(q => q.lesson === m.id).length;
+
+        const btn = document.createElement("button");
+        btn.className = "lesson-btn" + (currentLesson === m.id ? " active" : "");
+        btn.innerHTML = `
+          <div class="lesson-btn-top">
+            <span>${m.name}</span>
+            <span class="lesson-count">${count} câu</span>
+          </div>
+          <div class="lesson-desc">${m.desc}</div>
+        `;
+        btn.addEventListener("click", () => {
+          currentLesson = m.id;
+          searchInput.value = "";
+          displayedQuestions = getQuestionsByLesson(currentLesson);
+          renderSidebar();
+          renderQuestions();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+        lessonListEl.appendChild(btn);
+      });
+    }
+
+    function updateStats() {
+      const activeList = displayedQuestions;
+      let correct = 0;
+      let wrong = 0;
+
+      activeList.forEach(q => {
+        if (userSelections[q.id] !== undefined) {
+          if (userSelections[q.id] === q.ans) correct++;
+          else wrong++;
+        }
+      });
+
+      const done = correct + wrong;
+      const remain = Math.max(0, activeList.length - done);
+      const pct = activeList.length ? Math.round((done / activeList.length) * 100) : 0;
+
+      document.getElementById("stat-correct").textContent = correct;
+      document.getElementById("stat-wrong").textContent = wrong;
+      document.getElementById("stat-remain").textContent = remain;
+      document.getElementById("progress-fill").style.width = pct + "%";
+    }
+
+    function renderPalette() {
+      paletteGrid.innerHTML = "";
+      displayedQuestions.forEach((q, idx) => {
+        const dot = document.createElement("button");
+        dot.className = "p-dot";
+        const sel = userSelections[q.id];
+        if (sel !== undefined) {
+          dot.classList.add(sel === q.ans ? "done-correct" : "done-wrong");
+        }
+        dot.textContent = idx + 1;
+        dot.addEventListener("click", () => {
+          const target = document.getElementById("card_" + q.id);
+          if (target) {
+            target.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        });
+        paletteGrid.appendChild(dot);
+      });
+    }
+
+    function renderQuestions() {
+      const meta = LESSONS_META.find(m => m.id === currentLesson);
+      document.getElementById("current-lesson-title").textContent =
+        `${meta.name}: ${meta.desc}`;
+
+      const keyword = searchInput.value.trim().toLowerCase();
+      const filtered = displayedQuestions.filter(item =>
+        !keyword ||
+        item.q.toLowerCase().includes(keyword) ||
+        item.code.toLowerCase().includes(keyword) ||
+        item.options.some(o => o.toLowerCase().includes(keyword))
+      );
+
+      questionsContainer.innerHTML = "";
+
+      if (filtered.length === 0) {
+        questionsContainer.innerHTML = `
+          <div class="question-card" style="text-align:center; color:#64748b;">
+            Không tìm thấy câu hỏi nào khớp với từ khóa "<strong>${searchInput.value}</strong>".
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach((item) => {
+        const card = document.createElement("div");
+        card.className = "question-card";
+        card.id = "card_" + item.id;
+
+        const selectedIdx = userSelections[item.id];
+        const isAnswered = selectedIdx !== undefined;
+        const lessonLabel = LESSONS_META.find(m => m.id === item.lesson)?.name || "";
+
+        let statusHTML = "";
+        if (isAnswered) {
+          statusHTML = selectedIdx === item.ans
+            ? `<span class="q-status" style="color:#dc2626;">✔ Chính xác (Đáp án đỏ)</span>`
+            : `<span class="q-status" style="color:#475569;">✖ Sai (Xem dòng chữ đỏ)</span>`;
+        }
+
+        const optionsHTML = item.options.map((optText, oIdx) => {
+          let cls = "option-btn";
+          if (showAllRed && oIdx === item.ans) {
+            cls += " correct-answer";
+          } else if (isAnswered) {
+            if (oIdx === item.ans) cls += " correct-answer";
+            else if (oIdx === selectedIdx && selectedIdx !== item.ans) cls += " wrong-answer";
+          }
+
+          return `
+            <button type="button" class="${cls}" data-qid="${item.id}" data-oidx="${oIdx}">
+              <span>${optText}</span>
+            </button>
+          `;
+        }).join("");
+
+        card.innerHTML = `
+          <div class="q-header">
+            <span class="q-badge">${lessonLabel} • ${item.code}</span>
+            ${statusHTML}
+          </div>
+          <div class="q-title">${item.q}</div>
+          <div class="options-list">${optionsHTML}</div>
+        `;
+
+        questionsContainer.appendChild(card);
+      });
+
+      // Gắn sự kiện chọn đáp án
+      questionsContainer.querySelectorAll(".option-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const qid = btn.getAttribute("data-qid");
+          const oidx = parseInt(btn.getAttribute("data-oidx"), 10);
+          const qObj = QUESTION_BANK.find(q => q.id === qid);
+          if (!qObj) return;
+
+          userSelections[qid] = oidx;
+          const isCorrect = oidx === qObj.ans;
+          playSound(isCorrect);
+
+          renderQuestions();
+          updateStats();
+          renderPalette();
+        });
+      });
+
+      updateStats();
+      renderPalette();
+    }
+
+    /**************************************************************
+     * 5. CÁC NÚT ĐIỀU KHIỂN THANH CÔNG CỤ
+     **************************************************************/
+    document.getElementById("btn-show-red").addEventListener("click", (e) => {
+      showAllRed = !showAllRed;
+      const btn = e.currentTarget;
+      btn.classList.toggle("active", showAllRed);
+      document.getElementById("red-state").textContent = showAllRed ? "BẬT" : "TẮT";
+      renderQuestions();
+    });
+
+    document.getElementById("btn-sound").addEventListener("click", (e) => {
+      soundEnabled = !soundEnabled;
+      const btn = e.currentTarget;
+      btn.classList.toggle("active", soundEnabled);
+      document.getElementById("sound-state").textContent = soundEnabled ? "BẬT" : "TẮT";
+    });
+
+    document.getElementById("btn-shuffle").addEventListener("click", () => {
+      for (let i = displayedQuestions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [displayedQuestions[i], displayedQuestions[j]] = [displayedQuestions[j], displayedQuestions[i]];
+      }
+      renderQuestions();
+    });
+
+    document.getElementById("btn-reset").addEventListener("click", () => {
+      displayedQuestions.forEach(q => {
+        delete userSelections[q.id];
+      });
+      displayedQuestions = getQuestionsByLesson(currentLesson);
+      renderQuestions();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    searchInput.addEventListener("input", () => {
+      renderQuestions();
+    });
+
+    // Khởi tạo lần đầu
+    displayedQuestions = getQuestionsByLesson(currentLesson);
+    renderSidebar();
+    renderQuestions();
+  </script>
+</body>
+</html>
