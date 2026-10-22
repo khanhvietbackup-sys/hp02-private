@@ -7,7 +7,7 @@
   <style>
     :root {
       --bg-gradient: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 50%, #f3e8ff 100%);
-      --card-bg: rgba(255, 255, 255, 0.92);
+      --card-bg: rgba(255, 255, 255, 0.72);
       --primary: #4f46e5;
       --primary-hover: #4338ca;
       --primary-Soft: #eef2ff;
@@ -22,6 +22,17 @@
       --border-color: #e2e8f0;
       --shadow-md: 0 10px 25px -5px rgba(79, 70, 229, 0.08), 0 8px 10px -6px rgba(79, 70, 229, 0.04);
       --radius: 16px;
+
+      /* LIQUID GLASS TOKENS */
+      --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+      --ease-spring: cubic-bezier(0.34, 1.35, 0.64, 1);
+      --glass-blur: blur(22px) saturate(180%);
+      --glass-bg: rgba(255, 255, 255, 0.55);
+      --glass-bg-strong: rgba(255, 255, 255, 0.68);
+      --glass-border: 1px solid rgba(255, 255, 255, 0.65);
+      --glass-inner: inset 0 1px 0 rgba(255, 255, 255, 0.6), inset 0 -1px 0 rgba(255, 255, 255, 0.12);
+      --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.14);
+      --glass-shadow-lg: 0 24px 64px -12px rgba(31, 38, 135, 0.28);
     }
 
     * {
@@ -37,20 +48,109 @@
       background-attachment: fixed;
       color: var(--text-main);
       min-height: 100vh;
+      min-height: 100dvh;
       line-height: 1.55;
+      overflow-x: clip;
+      isolation: isolate;
+    }
+
+    /* Aurora nền Liquid Glass (chỉ transform/opacity -> mượt, nhẹ GPU) */
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      z-index: -1;
+      pointer-events: none;
+      will-change: transform;
+    }
+
+    body::before {
+      width: 55vmax;
+      height: 55vmax;
+      top: -18vmax;
+      right: -14vmax;
+      background: radial-gradient(circle at 30% 30%, rgba(99, 102, 241, 0.38), rgba(99, 102, 241, 0) 65%);
+      animation: auroraA 22s ease-in-out infinite alternate;
+    }
+
+    body::after {
+      width: 48vmax;
+      height: 48vmax;
+      bottom: -16vmax;
+      left: -12vmax;
+      background:
+        radial-gradient(circle at 60% 60%, rgba(236, 72, 153, 0.26), rgba(236, 72, 153, 0) 65%),
+        radial-gradient(circle at 30% 70%, rgba(6, 182, 212, 0.24), rgba(6, 182, 212, 0) 60%);
+      animation: auroraB 26s ease-in-out infinite alternate;
+    }
+
+    @keyframes auroraA {
+      from { transform: translate(0, 0) scale(1); }
+      to { transform: translate(-9vmax, 7vmax) scale(1.18); }
+    }
+
+    @keyframes auroraB {
+      from { transform: translate(0, 0) scale(1.1); }
+      to { transform: translate(8vmax, -6vmax) scale(0.94); }
     }
 
     /* MÀN HÌNH ĐĂNG NHẬP */
     #login-overlay {
       position: fixed;
       inset: 0;
-      background: linear-gradient(135deg, #312e81 0%, #4f46e5 50%, #0f766e 100%);
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 35%, #4f46e5 65%, #0e7490 100%);
+      background-size: 220% 220%;
+      animation: overlayShift 16s ease-in-out infinite alternate;
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 9999;
       padding: 20px;
-      transition: opacity 0.4s ease, visibility 0.4s ease;
+      min-height: 100dvh;
+      overflow: hidden;
+      transition: opacity 0.45s var(--ease-ios), visibility 0.45s;
+    }
+
+    @keyframes overlayShift {
+      from { background-position: 0% 20%; }
+      to { background-position: 100% 80%; }
+    }
+
+    /* Orbs lơ lửng sau thẻ kính */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(70px);
+      pointer-events: none;
+      will-change: transform;
+    }
+
+    .orb-a {
+      width: 42vmax; height: 42vmax;
+      top: -12vmax; left: -10vmax;
+      background: radial-gradient(circle, rgba(129, 140, 248, 0.55), transparent 65%);
+      animation: orbFloat 14s ease-in-out infinite alternate;
+    }
+
+    .orb-b {
+      width: 36vmax; height: 36vmax;
+      bottom: -10vmax; right: -8vmax;
+      background: radial-gradient(circle, rgba(34, 211, 238, 0.45), transparent 65%);
+      animation: orbFloat 18s ease-in-out infinite alternate-reverse;
+    }
+
+    .orb-c {
+      width: 26vmax; height: 26vmax;
+      top: 40%; left: 55%;
+      background: radial-gradient(circle, rgba(240, 171, 252, 0.4), transparent 65%);
+      animation: orbFloat 20s ease-in-out infinite alternate;
+    }
+
+    @keyframes orbFloat {
+      from { transform: translate(0, 0) scale(1); }
+      to { transform: translate(6vmax, -5vmax) scale(1.15); }
     }
 
     #login-overlay.hidden {
@@ -60,15 +160,31 @@
     }
 
     .login-card {
-      background: rgba(255, 255, 255, 0.96);
-      backdrop-filter: blur(16px);
+      position: relative;
+      background: rgba(255, 255, 255, 0.13);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      backdrop-filter: blur(28px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.35);
       width: 100%;
       max-width: 420px;
+      max-height: calc(100dvh - 40px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
       padding: 36px 28px;
-      border-radius: 24px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+      border-radius: 28px;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.5),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.08),
+        0 30px 80px -20px rgba(0, 0, 0, 0.5);
       text-align: center;
-      animation: floatUp 0.5s ease-out;
+      animation: cardIn 0.7s var(--ease-spring) both;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(28px) scale(0.96); }
+      to { opacity: 1; transform: none; }
     }
 
     @keyframes floatUp {
@@ -103,13 +219,14 @@
     .login-card h1 {
       font-size: 1.45rem;
       font-weight: 800;
-      color: #1e293b;
+      color: #ffffff;
       margin-bottom: 6px;
+      letter-spacing: -0.01em;
     }
 
     .login-card p {
       font-size: 0.92rem;
-      color: #64748b;
+      color: rgba(255, 255, 255, 0.72);
       margin-bottom: 24px;
     }
 
@@ -121,16 +238,26 @@
     .input-group input {
       width: 100%;
       padding: 14px 44px 14px 16px;
-      border: 2px solid #cbd5e1;
-      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1.5px solid rgba(255, 255, 255, 0.28);
+      border-radius: 14px;
       font-size: 1rem;
+      color: #ffffff;
       outline: none;
-      transition: all 0.2s;
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      transition: border-color 0.25s, box-shadow 0.25s, background 0.25s, transform 0.3s var(--ease-spring);
+    }
+
+    .input-group input::placeholder {
+      color: rgba(255, 255, 255, 0.55);
     }
 
     .input-group input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+      border-color: rgba(255, 255, 255, 0.75);
+      background: rgba(255, 255, 255, 0.16);
+      box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.14), 0 8px 24px rgba(0, 0, 0, 0.18);
+      transform: translateY(-1px);
     }
 
     .toggle-pw {
@@ -142,38 +269,158 @@
       border: none;
       cursor: pointer;
       font-size: 1.1rem;
-      color: #64748b;
+      color: rgba(255, 255, 255, 0.7);
+      transition: transform 0.2s var(--ease-spring);
+    }
+
+    .toggle-pw:active {
+      transform: translateY(-50%) scale(0.85);
     }
 
     .login-error {
-      color: #dc2626;
+      color: #fca5a5;
       font-size: 0.86rem;
       font-weight: 600;
       min-height: 20px;
       margin-bottom: 12px;
     }
 
+    /* TABS ĐĂNG NHẬP / ĐĂNG KÝ */
+    .login-tabs {
+      display: flex;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 14px;
+      padding: 4px;
+      margin-bottom: 18px;
+    }
+
+    .login-tab {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.65);
+      cursor: pointer;
+      transition: all 0.3s var(--ease-ios);
+    }
+
+    .login-tab.active {
+      background: rgba(255, 255, 255, 0.94);
+      color: var(--primary);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    }
+
+    .input-group .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 1rem;
+      pointer-events: none;
+    }
+
+    .input-group input.with-icon {
+      padding-left: 42px;
+    }
+
+    .remember-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .remember-row label {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .remember-row input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: -3px;
+      margin-right: 6px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .login-hint {
+      margin-top: 14px;
+      font-size: 0.78rem;
+      color: rgba(255, 255, 255, 0.55);
+      line-height: 1.5;
+    }
+
+    .login-hint a {
+      color: #ffffff;
+      font-weight: 600;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .hidden-form {
+      display: none;
+    }
+
     .btn-primary {
       width: 100%;
       padding: 14px;
       border: none;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      border-radius: 14px;
+      background: linear-gradient(180deg, #6d6df2 0%, #4f46e5 55%, #4338ca 100%);
       color: white;
       font-size: 1rem;
       font-weight: 700;
       cursor: pointer;
-      transition: transform 0.15s, box-shadow 0.2s;
-      box-shadow: 0 8px 16px rgba(79, 70, 229, 0.25);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -2px 6px rgba(0, 0, 0, 0.12),
+        0 10px 24px rgba(79, 70, 229, 0.4);
+      transition: transform 0.3s var(--ease-spring), box-shadow 0.3s var(--ease-ios), filter 0.2s;
     }
 
     .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 12px 20px rgba(79, 70, 229, 0.35);
+      transform: translateY(-2px) scale(1.01);
+      filter: brightness(1.07);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -2px 6px rgba(0, 0, 0, 0.12),
+        0 16px 32px rgba(79, 70, 229, 0.45);
     }
 
     .btn-primary:active {
-      transform: translateY(0);
+      transform: scale(0.97);
+      filter: brightness(0.97);
     }
 
     /* GIAO DIỆN CHÍNH */
@@ -181,9 +428,11 @@
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(255, 255, 255, 0.88);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+      background: rgba(255, 255, 255, 0.55);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 8px 24px rgba(31, 38, 135, 0.08);
       padding: 12px 20px;
     }
 
@@ -240,30 +489,41 @@
       gap: 6px;
       padding: 8px 13px;
       border-radius: 999px;
-      border: 1px solid #cbd5e1;
-      background: white;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.6);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
       color: #334155;
       font-size: 0.84rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 4px 12px rgba(31, 38, 135, 0.08);
+      transition: transform 0.3s var(--ease-spring), box-shadow 0.3s var(--ease-ios), background 0.25s, color 0.25s, border-color 0.25s;
     }
 
     .chip-btn:hover {
-      border-color: var(--primary);
+      transform: translateY(-2px);
+      border-color: rgba(99, 102, 241, 0.5);
       color: var(--primary);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 8px 18px rgba(79, 70, 229, 0.16);
+    }
+
+    .chip-btn:active {
+      transform: scale(0.94);
     }
 
     .chip-btn.active {
-      background: var(--primary);
+      background: linear-gradient(135deg, #4f46e5, #6366f1);
       color: white;
-      border-color: var(--primary);
+      border-color: transparent;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 8px 18px rgba(79, 70, 229, 0.35);
     }
 
     .chip-btn.red-mode.active {
-      background: #dc2626;
-      border-color: #dc2626;
+      background: linear-gradient(135deg, #dc2626, #ef4444);
+      border-color: transparent;
       color: white;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 8px 18px rgba(220, 38, 38, 0.35);
     }
 
     .container {
@@ -278,11 +538,13 @@
 
     /* SIDEBAR DANH SÁCH BÀI */
     .sidebar {
-      background: var(--card-bg);
-      border-radius: var(--radius);
+      background: var(--glass-bg-strong);
+      -webkit-backdrop-filter: var(--glass-blur);
+      backdrop-filter: var(--glass-blur);
+      border-radius: 20px;
       padding: 18px;
-      box-shadow: var(--shadow-md);
-      border: 1px solid rgba(255, 255, 255, 0.7);
+      box-shadow: var(--glass-inner), var(--glass-shadow);
+      border: var(--glass-border);
       position: sticky;
       top: 76px;
     }
@@ -309,26 +571,36 @@
       width: 100%;
       text-align: left;
       padding: 11px 14px;
-      border-radius: 12px;
-      border: 1px solid transparent;
-      background: #f8fafc;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      background: rgba(255, 255, 255, 0.5);
       color: #334155;
       cursor: pointer;
-      transition: all 0.2s;
       display: flex;
       flex-direction: column;
       gap: 3px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      transition: transform 0.3s var(--ease-spring), background 0.25s, box-shadow 0.3s var(--ease-ios), border-color 0.25s;
+      animation: riseIn 0.5s var(--ease-ios) backwards;
+      animation-delay: calc(var(--i, 0) * 60ms);
     }
 
     .lesson-btn:hover {
-      background: #eef2ff;
-      border-color: #c7d2fe;
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.85);
+      border-color: rgba(165, 180, 252, 0.7);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 10px 22px rgba(79, 70, 229, 0.14);
+    }
+
+    .lesson-btn:active {
+      transform: scale(0.98);
     }
 
     .lesson-btn.active {
       background: linear-gradient(135deg, #4f46e5, #6366f1);
       color: white;
-      box-shadow: 0 6px 14px rgba(79, 70, 229, 0.25);
+      border-color: transparent;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 10px 22px rgba(79, 70, 229, 0.35);
     }
 
     .lesson-btn-top {
@@ -371,10 +643,11 @@
     }
 
     .stat-item {
-      background: #f8fafc;
+      background: rgba(255, 255, 255, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
       padding: 8px 4px;
-      border-radius: 10px;
-      border: 1px solid #e2e8f0;
+      border-radius: 12px;
     }
 
     .stat-val {
@@ -399,10 +672,13 @@
     }
 
     .toolbar-card {
-      background: var(--card-bg);
-      border-radius: var(--radius);
+      background: var(--glass-bg-strong);
+      -webkit-backdrop-filter: var(--glass-blur);
+      backdrop-filter: var(--glass-blur);
+      border-radius: 20px;
       padding: 16px 20px;
-      box-shadow: var(--shadow-md);
+      box-shadow: var(--glass-inner), var(--glass-shadow);
+      border: var(--glass-border);
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
@@ -419,14 +695,18 @@
     .search-box input {
       width: 100%;
       padding: 10px 14px 10px 36px;
-      border-radius: 10px;
-      border: 1px solid #cbd5e1;
-      font-size: 0.92rem;
+      border-radius: 12px;
+      border: 1.5px solid rgba(203, 213, 225, 0.9);
+      background: rgba(255, 255, 255, 0.7);
+      font-size: 16px;
       outline: none;
+      transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
     }
 
     .search-box input:focus {
       border-color: var(--primary);
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.14);
     }
 
     .search-icon {
@@ -447,19 +727,51 @@
     }
 
     .progress-bar-fill {
+      position: relative;
       height: 100%;
       background: linear-gradient(90deg, #4f46e5, #ec4899, #dc2626);
       width: 0%;
-      transition: width 0.3s ease;
+      border-radius: 99px;
+      overflow: hidden;
+      transition: width 0.5s var(--ease-ios);
     }
 
+    .progress-bar-fill::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+      animation: shimmer 2.4s linear infinite;
+    }
+
+    @keyframes shimmer {
+      from { transform: translateX(-100%); }
+      to { transform: translateX(100%); }
+    }
+
+    /* Thẻ câu hỏi: kính mờ nhẹ (không blur nặng để cuộn mượt trên điện thoại) */
     .question-card {
-      background: var(--card-bg);
-      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.78);
+      border-radius: 20px;
       padding: 22px;
-      box-shadow: var(--shadow-md);
-      border: 1px solid rgba(255, 255, 255, 0.8);
-      transition: transform 0.2s ease;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 12px 32px rgba(31, 38, 135, 0.1);
+      transition: transform 0.35s var(--ease-ios), box-shadow 0.35s var(--ease-ios);
+    }
+
+    .animate-in .question-card {
+      animation: riseIn 0.55s var(--ease-ios) backwards;
+      animation-delay: calc(var(--i, 0) * 45ms);
+    }
+
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(22px) scale(0.985); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .question-card:hover {
+      transform: translateY(-3px);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 20px 44px rgba(31, 38, 135, 0.16);
     }
 
     .q-header {
@@ -472,9 +784,11 @@
 
     .q-badge {
       display: inline-block;
-      padding: 4px 10px;
-      border-radius: 8px;
-      background: #eef2ff;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(238, 242, 255, 0.8);
+      border: 1px solid rgba(199, 210, 254, 0.8);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
       color: #4f46e5;
       font-weight: 700;
       font-size: 0.8rem;
@@ -502,23 +816,29 @@
       width: 100%;
       text-align: left;
       padding: 13px 16px;
-      border-radius: 12px;
-      border: 1.5px solid #e2e8f0;
-      background: #ffffff;
+      border-radius: 14px;
+      border: 1.5px solid rgba(226, 232, 240, 0.9);
+      background: rgba(255, 255, 255, 0.65);
       color: #1e293b;
       font-size: 0.96rem;
       line-height: 1.45;
       cursor: pointer;
-      transition: all 0.18s ease;
       display: flex;
       align-items: flex-start;
       gap: 10px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      transition: transform 0.3s var(--ease-spring), border-color 0.2s, background 0.2s, box-shadow 0.3s var(--ease-ios);
     }
 
     .option-btn:hover:not(.locked) {
-      border-color: #6366f1;
-      background: #f5f7ff;
-      transform: translateX(3px);
+      border-color: #818cf8;
+      background: rgba(238, 242, 255, 0.9);
+      transform: translateX(4px) scale(1.005);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 10px 24px rgba(79, 70, 229, 0.16);
+    }
+
+    .option-btn:active:not(.locked) {
+      transform: scale(0.985);
     }
 
     .opt-letter {
@@ -534,10 +854,17 @@
       color: var(--correct-red) !important;
       font-weight: 700;
       box-shadow: 0 4px 12px rgba(220, 38, 38, 0.12);
+      animation: correctPop 0.55s var(--ease-spring);
     }
 
     .option-btn.correct-answer .opt-letter {
       color: var(--correct-red) !important;
+    }
+
+    @keyframes correctPop {
+      0% { transform: scale(0.98); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+      60% { transform: scale(1.012); }
+      100% { transform: scale(1); box-shadow: 0 0 0 16px rgba(220, 38, 38, 0); }
     }
 
     /* ĐÁP ÁN CHỌN SAI */
@@ -567,19 +894,26 @@
 
     .p-dot {
       height: 32px;
-      border-radius: 8px;
-      border: 1px solid #cbd5e1;
-      background: white;
+      border-radius: 10px;
+      border: 1px solid rgba(203, 213, 225, 0.9);
+      background: rgba(255, 255, 255, 0.65);
       font-size: 0.78rem;
       font-weight: 700;
       cursor: pointer;
       color: #475569;
-      transition: all 0.15s;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      transition: transform 0.25s var(--ease-spring), background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.25s;
     }
 
     .p-dot:hover {
+      transform: translateY(-2px);
       border-color: var(--primary);
       color: var(--primary);
+      box-shadow: 0 6px 14px rgba(79, 70, 229, 0.18);
+    }
+
+    .p-dot:active {
+      transform: scale(0.92);
     }
 
     .p-dot.done-correct {
@@ -594,47 +928,227 @@
       color: white;
     }
 
-    /* TỐI ƯU ĐIỆN THOẠI */
-    @media (max-width: 860px) {
+    /* RESPONSIVE: MÁY TÍNH BẢNG */
+    @media (max-width: 960px) {
       .container {
         grid-template-columns: 1fr;
+        gap: 16px;
       }
       .sidebar {
         position: static;
       }
       .lesson-list {
         display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      }
+    }
+
+    /* RESPONSIVE: ĐIỆN THOẠI */
+    @media (max-width: 860px) {
+      header {
+        padding: 10px 12px;
+      }
+      .header-inner {
+        gap: 8px;
+      }
+      .brand-title {
+        font-size: 0.98rem;
+        line-height: 1.3;
+      }
+      .brand-sub {
+        display: none;
+      }
+      .brand-icon {
+        width: 34px;
+        height: 34px;
+        font-size: 1rem;
+      }
+      .header-controls {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        width: 100%;
+        padding: 2px 2px 6px;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+      }
+      .header-controls::-webkit-scrollbar {
+        display: none;
+      }
+      .chip-btn {
+        flex: 0 0 auto;
+        white-space: nowrap;
+        min-height: 40px;
+      }
+      .container {
+        margin-top: 12px;
+        padding: 0 12px calc(48px + env(safe-area-inset-bottom, 0px));
+      }
+      .lesson-list {
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      }
+      .lesson-btn {
+        animation: none;
+      }
+      .toolbar-card {
+        padding: 14px;
+        border-radius: 18px;
+      }
+      .search-box {
+        flex: 1 1 100%;
+        min-width: 0;
       }
       .question-card {
         padding: 16px;
+        border-radius: 18px;
+      }
+      .animate-in .question-card {
+        animation-duration: 0.4s;
+        animation-delay: calc(var(--i, 0) * 25ms);
       }
       .q-title {
-        font-size: 0.98rem;
+        font-size: clamp(0.95rem, 4.2vw, 1.02rem);
+        overflow-wrap: break-word;
       }
       .option-btn {
-        padding: 12px;
+        padding: 13px 12px;
         font-size: 0.92rem;
+        min-height: 48px;
+        align-items: center;
+      }
+      .palette-grid {
+        grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+      }
+      .p-dot {
+        height: 40px;
+      }
+      .login-card {
+        padding: 28px 20px;
+        border-radius: 24px;
+      }
+      .login-card h1 {
+        font-size: 1.25rem;
+      }
+    }
+
+    /* ĐIỆN THOẠI NHỎ */
+    @media (max-width: 400px) {
+      .brand-title {
+        font-size: 0.88rem;
+      }
+      .lesson-list {
+        grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+      }
+      .q-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    /* MÀN HÌNH NGANG THẤP (điện thoại xoay ngang) */
+    @media (max-height: 500px) {
+      .login-card {
+        max-height: calc(100dvh - 24px);
+        padding: 22px 20px;
+      }
+      .login-badge {
+        width: 48px;
+        height: 48px;
+        font-size: 22px;
+        margin-bottom: 10px;
+      }
+      .login-card p {
+        margin-bottom: 14px;
+      }
+    }
+
+    /* THIẾT BỊ CẢM ỨNG: tắt hover để không bị dính trạng thái */
+    @media (hover: none) {
+      .option-btn:hover:not(.locked) {
+        transform: none;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      }
+      .question-card:hover {
+        transform: none;
+      }
+      .chip-btn:hover {
+        transform: none;
+      }
+      .lesson-btn:hover {
+        transform: none;
+      }
+      .p-dot:hover {
+        transform: none;
+      }
+    }
+
+    /* GIẢM CHUYỂN ĐỘNG cho người dùng nhạy cảm */
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- MÀN HÌNH KHÓA MẬT KHẨU -->
+  <!-- MÀN HÌNH ĐĂNG NHẬP (KeyAuth) -->
   <div id="login-overlay">
+    <div class="orb orb-a"></div>
+    <div class="orb orb-b"></div>
+    <div class="orb orb-c"></div>
     <div class="login-card" id="login-card">
       <div class="login-badge">🛡️</div>
       <h1>Ngân Hàng Câu Hỏi Học Phần 2</h1>
-      <p>Vui lòng nhập mật khẩu để vào hệ thống ôn tập</p>
+      <p id="login-sub">Đăng nhập tài khoản để vào hệ thống ôn tập</p>
+
+      <div class="login-tabs" id="login-tabs">
+        <button type="button" class="login-tab active" id="tab-login">Đăng nhập</button>
+        <button type="button" class="login-tab" id="tab-register">Đăng ký</button>
+      </div>
+
+      <!-- FORM ĐĂNG NHẬP -->
       <form id="login-form">
         <div class="input-group">
-          <input type="password" id="pw-input" placeholder="Nhập mật khẩu truy cập..." autocomplete="off" required />
+          <span class="input-icon">👤</span>
+          <input type="text" id="ka-username" class="with-icon" placeholder="Tên tài khoản" autocomplete="username" required />
+        </div>
+        <div class="input-group">
+          <span class="input-icon">🔒</span>
+          <input type="password" id="ka-password" class="with-icon" placeholder="Mật khẩu" autocomplete="current-password" required />
           <button type="button" class="toggle-pw" id="toggle-pw" title="Hiện/Ẩn mật khẩu">👁️</button>
         </div>
+        <div class="remember-row">
+          <label><input type="checkbox" id="remember-me" checked /> Ghi nhớ tôi</label>
+          <span id="hwid-label" title="Mã định danh thiết bị"></span>
+        </div>
         <div class="login-error" id="login-error"></div>
-        <button type="submit" class="btn-primary">Đăng Nhập Ngay</button>
+        <button type="submit" class="btn-primary" id="btn-login">Đăng Nhập Ngay</button>
       </form>
+
+      <!-- FORM ĐĂNG KÝ (bằng key kích hoạt) -->
+      <form id="register-form" class="hidden-form">
+        <div class="input-group">
+          <span class="input-icon">👤</span>
+          <input type="text" id="reg-username" class="with-icon" placeholder="Tên tài khoản muốn tạo" autocomplete="off" required />
+        </div>
+        <div class="input-group">
+          <span class="input-icon">🔒</span>
+          <input type="password" id="reg-password" class="with-icon" placeholder="Mật khẩu" autocomplete="new-password" required />
+          <button type="button" class="toggle-pw" id="toggle-pw-reg" title="Hiện/Ẩn mật khẩu">👁️</button>
+        </div>
+        <div class="input-group">
+          <span class="input-icon">🔑</span>
+          <input type="text" id="reg-key" class="with-icon" placeholder="Key kích hoạt" autocomplete="off" required />
+        </div>
+        <div class="login-error" id="register-error"></div>
+        <button type="submit" class="btn-primary" id="btn-register">Tạo Tài Khoản</button>
+      </form>
+
+      <div class="login-hint" id="login-hint"></div>
     </div>
   </div>
 
@@ -649,6 +1163,9 @@
         </div>
       </div>
       <div class="header-controls">
+        <button class="chip-btn hidden-form" id="btn-logout" title="Đăng xuất tài khoản hiện tại">
+          🚪 <span id="logout-username"></span>
+        </button>
         <button class="chip-btn red-mode" id="btn-show-red" title="Hiện toàn bộ đáp án chữ đỏ để học thuộc">
           🔴 Hiện đáp án chữ đỏ: <span id="red-state">TẮT</span>
         </button>
@@ -3021,35 +3538,319 @@
     });
 
     /**************************************************************
-     * 3. XỬ LÝ MẬT KHẨU ĐĂNG NHẬP (21012008ngo)
+     * 3. ĐĂNG NHẬP BẰNG KEYAUTH (quản lý tài khoản/mật khẩu tại keyauth.cc)
+     *
+     * HƯỚNG DẪN CẤU HÌNH (chỉ làm 1 lần):
+     *  1. Vào https://keyauth.cc -> Applications -> Add Application (tạo app)
+     *  2. Mở app -> bấm nút "Code Snippet" -> copy "name" và "ownerid"
+     *  3. Dán vào KEYAUTH_CONFIG bên dưới
+     *  4. Cấp tài khoản cho người dùng: Users -> Add User (đặt username/password),
+     *     hoặc tạo License Key (Licenses -> Create) rồi đưa key cho họ tự
+     *     đăng ký ở tab "Đăng ký" trên màn hình đăng nhập.
+     *  5. Đổi / reset mật khẩu, khóa tài khoản, reset HWID: làm ngay trên
+     *     dashboard của KeyAuth, web sẽ áp dụng tức thì.
      **************************************************************/
-    const REQUIRED_PASS = "21012008ngo";
+    const KEYAUTH_CONFIG = {
+      name: "Userviet's Application",
+      ownerid: "gk6LcX2zsZ",
+      version: "1.0",
+      apiUrl: "https://keyauth.win/api/1.2/",
+      // Đã tắt mật khẩu dùng chung — chỉ đăng nhập bằng tài khoản KeyAuth
+      legacyPassword: ""
+    };
+
+    const USE_KEYAUTH =
+      KEYAUTH_CONFIG.name !== "TÊN_APP" &&
+      KEYAUTH_CONFIG.ownerid !== "OWNER_ID";
+
     const loginOverlay = document.getElementById("login-overlay");
     const loginCard = document.getElementById("login-card");
     const loginForm = document.getElementById("login-form");
-    const pwInput = document.getElementById("pw-input");
+    const registerForm = document.getElementById("register-form");
     const loginError = document.getElementById("login-error");
-    const togglePwBtn = document.getElementById("toggle-pw");
+    const registerError = document.getElementById("register-error");
+    const loginHint = document.getElementById("login-hint");
+    const btnLogin = document.getElementById("btn-login");
+    const btnRegister = document.getElementById("btn-register");
+    const tabLogin = document.getElementById("tab-login");
+    const tabRegister = document.getElementById("tab-register");
+    const btnLogout = document.getElementById("btn-logout");
+    const logoutUsername = document.getElementById("logout-username");
 
-    togglePwBtn.addEventListener("click", () => {
-      const isPw = pwInput.type === "password";
-      pwInput.type = isPw ? "text" : "password";
-      togglePwBtn.textContent = isPw ? "🙈" : "👁️";
-    });
+    /* ---------- HWID: mã định danh riêng cho từng trình duyệt ---------- */
+    function getHwid() {
+      let hwid = localStorage.getItem("ka_hwid");
+      if (!hwid) {
+        hwid = "web-" + ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+          (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+        );
+        localStorage.setItem("ka_hwid", hwid);
+      }
+      return hwid;
+    }
 
-    loginForm.addEventListener("submit", (e) => {
+    /* ---------- Gọi API KeyAuth ---------- */
+    async function keyauthRequest(params) {
+      // KeyAuth yêu cầu name + ownerid trong MỌI request (không chỉ init)
+      const full = {
+        name: KEYAUTH_CONFIG.name,
+        ownerid: KEYAUTH_CONFIG.ownerid,
+        ...params
+      };
+      const res = await fetch(KEYAUTH_CONFIG.apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams(full).toString()
+      });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return await res.json();
+    }
+
+    let kaSessionId = null;
+
+    async function keyauthInit() {
+      const data = await keyauthRequest({
+        type: "init",
+        ver: KEYAUTH_CONFIG.version,
+        name: KEYAUTH_CONFIG.name,
+        ownerid: KEYAUTH_CONFIG.ownerid
+      });
+      if (!data.success) throw new Error(data.message || "Init thất bại");
+      kaSessionId = data.sessionid;
+      return data;
+    }
+
+    /* Dịch thông báo lỗi KeyAuth sang tiếng Việt (kiểm tra cụ thể trước, chung sau) */
+    function translateKaError(msg) {
+      const m = (msg || "").toLowerCase();
+      if (m.includes("taken") || m.includes("already exists"))
+        return "Tên tài khoản đã tồn tại. Hãy chọn tên khác.";
+      if (m.includes("banned")) return "Tài khoản này đã bị khóa. Liên hệ quản trị viên.";
+      if (m.includes("hwid")) return "Tài khoản đang dùng trên thiết bị khác. Liên hệ quản trị viên để reset HWID.";
+      if (m.includes("subscription")) return "Tài khoản chưa được cấp quyền sử dụng.";
+      if (m.includes("ownerid") || m.includes("no ownerid"))
+        return "Sai cấu hình OwnerID. Kiểm tra lại KEYAUTH_CONFIG trong file.";
+      if (m.includes("key")) return "Key kích hoạt không hợp lệ hoặc đã được sử dụng.";
+      if (m.includes("paused")) return "Ứng dụng đang tạm dừng. Liên hệ quản trị viên.";
+      if (m.includes("username") || m.includes("password"))
+        return "Tài khoản hoặc mật khẩu chưa đúng. Vui lòng thử lại.";
+      return msg || "Đăng nhập thất bại. Vui lòng thử lại.";
+    }
+
+    function showAuthError(el, msg) {
+      el.style.color = "";
+      el.textContent = msg;
+      loginCard.classList.remove("shake");
+      void loginCard.offsetWidth;
+      loginCard.classList.add("shake");
+    }
+
+    function setLoading(btn, loading, text) {
+      btn.disabled = loading;
+      btn.innerHTML = loading ? '<span class="spinner"></span>Đang xử lý...' : text;
+    }
+
+    /* ---------- Lưu / khôi phục phiên đăng nhập ---------- */
+    function saveSession(username, remember) {
+      localStorage.removeItem("ka_session");
+      sessionStorage.removeItem("ka_session");
+      const store = remember ? localStorage : sessionStorage;
+      store.setItem("ka_session", JSON.stringify({ u: username, s: kaSessionId, t: Date.now() }));
+    }
+
+    function getSavedSession() {
+      try {
+        return JSON.parse(localStorage.getItem("ka_session") || sessionStorage.getItem("ka_session") || "null");
+      } catch (e) { return null; }
+    }
+
+    function clearSession() {
+      localStorage.removeItem("ka_session");
+      sessionStorage.removeItem("ka_session");
+      kaSessionId = null;
+    }
+
+    /* ---------- Vào app sau khi đăng nhập thành công ---------- */
+    function enterApp(username) {
+      playSound(true);
+      loginOverlay.classList.add("hidden");
+      logoutUsername.textContent = username;
+      btnLogout.classList.remove("hidden-form");
+    }
+
+    /* ---------- Chuyển tab Đăng nhập / Đăng ký ---------- */
+    function switchTab(which) {
+      const isLogin = which === "login";
+      tabLogin.classList.toggle("active", isLogin);
+      tabRegister.classList.toggle("active", !isLogin);
+      loginForm.classList.toggle("hidden-form", !isLogin);
+      registerForm.classList.toggle("hidden-form", isLogin);
+    }
+    tabLogin.addEventListener("click", () => switchTab("login"));
+    tabRegister.addEventListener("click", () => switchTab("register"));
+
+    /* ---------- Nút hiện/ẩn mật khẩu ---------- */
+    function bindToggle(btnId, inputId) {
+      const btn = document.getElementById(btnId);
+      const input = document.getElementById(inputId);
+      if (!btn || !input) return;
+      btn.addEventListener("click", () => {
+        const isPw = input.type === "password";
+        input.type = isPw ? "text" : "password";
+        btn.textContent = isPw ? "🙈" : "👁️";
+      });
+    }
+    bindToggle("toggle-pw", "ka-password");
+    bindToggle("toggle-pw-reg", "reg-password");
+
+    /* ---------- XỬ LÝ ĐĂNG NHẬP ---------- */
+    loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      if (pwInput.value.trim() === REQUIRED_PASS) {
-        playSound(true);
-        loginOverlay.classList.add("hidden");
-      } else {
+      const username = document.getElementById("ka-username").value.trim();
+      const password = document.getElementById("ka-password").value;
+      const remember = document.getElementById("remember-me").checked;
+      loginError.style.color = "";
+      loginError.textContent = "";
+
+      // Chế độ mật khẩu dùng chung (khi chưa cấu hình KeyAuth)
+      if (!USE_KEYAUTH) {
+        if (KEYAUTH_CONFIG.legacyPassword && password === KEYAUTH_CONFIG.legacyPassword) {
+          enterApp(username || "Khách");
+        } else {
+          playSound(false);
+          showAuthError(loginError, "Mật khẩu chưa chính xác! Vui lòng thử lại.");
+        }
+        return;
+      }
+
+      if (!username || !password) {
+        showAuthError(loginError, "Vui lòng nhập đầy đủ tài khoản và mật khẩu.");
+        return;
+      }
+
+      setLoading(btnLogin, true);
+      try {
+        if (!kaSessionId) await keyauthInit();
+        const data = await keyauthRequest({
+          type: "login",
+          sessionid: kaSessionId,
+          username: username,
+          pass: password,
+          hwid: getHwid()
+        });
+        if (data.success) {
+          saveSession(username, remember);
+          enterApp(username);
+        } else {
+          playSound(false);
+          console.warn("[KeyAuth] login:", data.message);
+          showAuthError(loginError, translateKaError(data.message));
+        }
+      } catch (err) {
         playSound(false);
-        loginError.textContent = "Mật khẩu chưa chính xác! Vui lòng thử lại.";
-        loginCard.classList.remove("shake");
-        void loginCard.offsetWidth;
-        loginCard.classList.add("shake");
+        showAuthError(loginError, "Không kết nối được tới KeyAuth. Kiểm tra mạng và cấu hình app.");
+        console.error("[KeyAuth]", err);
+      } finally {
+        setLoading(btnLogin, false, "Đăng Nhập Ngay");
       }
     });
+
+    /* ---------- XỬ LÝ ĐĂNG KÝ (bằng key kích hoạt) ---------- */
+    registerForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const username = document.getElementById("reg-username").value.trim();
+      const password = document.getElementById("reg-password").value;
+      const key = document.getElementById("reg-key").value.trim();
+      registerError.style.color = "";
+      registerError.textContent = "";
+
+      if (!USE_KEYAUTH) {
+        showAuthError(registerError, "Chức năng đăng ký cần cấu hình KeyAuth trước.");
+        return;
+      }
+      if (username.length < 3) {
+        showAuthError(registerError, "Tên tài khoản phải từ 3 ký tự trở lên.");
+        return;
+      }
+
+      setLoading(btnRegister, true);
+      try {
+        if (!kaSessionId) await keyauthInit();
+        const data = await keyauthRequest({
+          type: "register",
+          sessionid: kaSessionId,
+          username: username,
+          pass: password,
+          key: key,
+          hwid: getHwid()
+        });
+        if (data.success) {
+          switchTab("login");
+          document.getElementById("ka-username").value = username;
+          document.getElementById("ka-password").value = "";
+          loginError.style.color = "#16a34a";
+          loginError.textContent = "Tạo tài khoản thành công! Hãy đăng nhập.";
+          setTimeout(() => { loginError.style.color = ""; loginError.textContent = ""; }, 5000);
+        } else {
+          playSound(false);
+          console.warn("[KeyAuth] register:", data.message);
+          showAuthError(registerError, translateKaError(data.message));
+        }
+      } catch (err) {
+        playSound(false);
+        showAuthError(registerError, "Không kết nối được tới KeyAuth. Kiểm tra mạng và cấu hình app.");
+        console.error("[KeyAuth]", err);
+      } finally {
+        setLoading(btnRegister, false, "Tạo Tài Khoản");
+      }
+    });
+
+    /* ---------- Đăng xuất ---------- */
+    btnLogout.addEventListener("click", async () => {
+      try {
+        if (USE_KEYAUTH && kaSessionId) {
+          await keyauthRequest({ type: "logout", sessionid: kaSessionId });
+        }
+      } catch (err) { console.warn("[KeyAuth] logout:", err); }
+      clearSession();
+      btnLogout.classList.add("hidden-form");
+      document.getElementById("ka-password").value = "";
+      switchTab("login");
+      loginOverlay.classList.remove("hidden");
+    });
+
+    /* ---------- Tự động đăng nhập nếu còn phiên hợp lệ ---------- */
+    async function autoLogin() {
+      if (!USE_KEYAUTH) return;
+      const saved = getSavedSession();
+      if (!saved || !saved.s || !saved.u) return;
+      try {
+        const data = await keyauthRequest({ type: "check", sessionid: saved.s });
+        if (data.success) {
+          kaSessionId = saved.s;
+          enterApp(saved.u);
+        } else {
+          clearSession();
+        }
+      } catch (err) {
+        console.warn("[KeyAuth] auto-login:", err);
+      }
+    }
+
+    /* ---------- Khởi tạo giao diện theo chế độ ---------- */
+    (function initAuthUI() {
+      if (!USE_KEYAUTH) {
+        document.getElementById("login-tabs").style.display = "none";
+        document.getElementById("ka-username").closest(".input-group").style.display = "none";
+        document.getElementById("ka-username").required = false;
+        document.querySelector(".remember-row").style.display = "none";
+        document.getElementById("login-sub").textContent = "Nhập mật khẩu dùng chung để vào hệ thống";
+        loginHint.innerHTML = 'Chưa cấu hình KeyAuth — đang dùng mật khẩu dùng chung.<br>Mở file, tìm <b>KEYAUTH_CONFIG</b> rồi dán <b>name</b> + <b>ownerid</b> lấy từ <a href="https://keyauth.cc/app/" target="_blank" rel="noopener">keyauth.cc/app</a> để bật đăng nhập tài khoản.';
+      } else {
+        loginHint.innerHTML = 'Tài khoản do quản trị viên cấp tại <a href="https://keyauth.cc/" target="_blank" rel="noopener">keyauth.cc</a>.<br>Chưa có tài khoản? Dùng <b>key kích hoạt</b> ở tab Đăng ký.';
+        autoLogin();
+      }
+    })();
 
     /**************************************************************
      * 4. QUẢN LÝ TRẠNG THÁI & HIỂN THỊ CÂU HỎI
@@ -3071,13 +3872,14 @@
 
     function renderSidebar() {
       lessonListEl.innerHTML = "";
-      LESSONS_META.forEach(m => {
+      LESSONS_META.forEach((m, mi) => {
         const count = m.id === "all"
           ? QUESTION_BANK.length
           : QUESTION_BANK.filter(q => q.lesson === m.id).length;
 
         const btn = document.createElement("button");
         btn.className = "lesson-btn" + (currentLesson === m.id ? " active" : "");
+        btn.style.setProperty("--i", mi);
         btn.innerHTML = `
           <div class="lesson-btn-top">
             <span>${m.name}</span>
@@ -3090,7 +3892,7 @@
           searchInput.value = "";
           displayedQuestions = getQuestionsByLesson(currentLesson);
           renderSidebar();
-          renderQuestions();
+          renderQuestions(true);
           window.scrollTo({ top: 0, behavior: "smooth" });
         });
         lessonListEl.appendChild(btn);
@@ -3139,7 +3941,7 @@
       });
     }
 
-    function renderQuestions() {
+    function renderQuestions(animate = false) {
       const meta = LESSONS_META.find(m => m.id === currentLesson);
       document.getElementById("current-lesson-title").textContent =
         `${meta.name}: ${meta.desc}`;
@@ -3153,6 +3955,7 @@
       );
 
       questionsContainer.innerHTML = "";
+      questionsContainer.classList.toggle("animate-in", animate);
 
       if (filtered.length === 0) {
         questionsContainer.innerHTML = `
@@ -3163,10 +3966,11 @@
         return;
       }
 
-      filtered.forEach((item) => {
+      filtered.forEach((item, idx) => {
         const card = document.createElement("div");
         card.className = "question-card";
         card.id = "card_" + item.id;
+        card.style.setProperty("--i", Math.min(idx, 14));
 
         const selectedIdx = userSelections[item.id];
         const isAnswered = selectedIdx !== undefined;
@@ -3252,7 +4056,7 @@
         const j = Math.floor(Math.random() * (i + 1));
         [displayedQuestions[i], displayedQuestions[j]] = [displayedQuestions[j], displayedQuestions[i]];
       }
-      renderQuestions();
+      renderQuestions(true);
     });
 
     document.getElementById("btn-reset").addEventListener("click", () => {
@@ -3260,7 +4064,7 @@
         delete userSelections[q.id];
       });
       displayedQuestions = getQuestionsByLesson(currentLesson);
-      renderQuestions();
+      renderQuestions(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
 
@@ -3271,7 +4075,7 @@
     // Khởi tạo lần đầu
     displayedQuestions = getQuestionsByLesson(currentLesson);
     renderSidebar();
-    renderQuestions();
+    renderQuestions(true);
   </script>
 </body>
 </html>
